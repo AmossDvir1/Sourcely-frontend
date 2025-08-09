@@ -45,6 +45,7 @@ html {
 
   /* Primary */
   --color-primary: #a3f1e7;
+  --color-primary-rgb: 163, 241, 231;
   --color-primary-hover: #3cb9bc;
   --color-primary-disabled: #a5e8e9;
 
@@ -73,6 +74,8 @@ html {
   --color-bg-paper: #ffffff;
   --color-bg-default-light: #e9edf3;
   --color-bg-hover: #f0f2f5;
+  --color-bg-glass: #d1fcf9; /* A transparent version of your --color-bg-default */
+  --color-border-glass: rgba(214, 220, 229, 0.6); /* A transparent version of your --color-border */
 
   /* Text */
   --color-text-primary: #061e1c;
@@ -97,12 +100,15 @@ html {
 .dark {
 
     --color-primary: #62d9ca;
+    --color-primary-rgb: 163, 241, 231;
     --color-secondary: #7a4fe6;
 
   --color-bg-default: #10151d;
   --color-bg-default-dark: #10151d;
   --color-bg-paper: #192532;
   --color-bg-hover: #223344;
+  --color-bg-glass: #2f4e4c; /* A transparent version of your --color-bg-paper */
+  --color-border-glass: rgba(47, 59, 74, 0.7); /* A transparent version of your --color-border */
 
   --color-text-primary: #e1f9f7;
   --color-text-primary-bright: #e1f9f7;

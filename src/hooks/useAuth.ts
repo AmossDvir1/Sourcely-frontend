@@ -1,9 +1,16 @@
 import { createContext, useContext } from 'react';
 
-// Define the shape of the context data
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
 export interface AuthContextType {
   isAuthenticated: boolean;
-  /* eslint-disable @typescript-eslint/no-explicit-any */
+  user: User | null; // User will be null if not authenticated
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   login: (credentials: any) => Promise<void>;
   logout: () => void;
 }
@@ -11,7 +18,7 @@ export interface AuthContextType {
 // Create the context with a default value
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Create the custom hook for consuming the context
+// The custom hook remains the same
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {

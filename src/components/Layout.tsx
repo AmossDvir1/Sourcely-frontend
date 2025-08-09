@@ -6,6 +6,7 @@ import { useAuth } from "../hooks/useAuth";
 import { CustomButton as Button } from "./atoms/CustomButton";
 import LogoutButton from "./LogoutButton";
 import Typography from "./atoms/Typography";
+import UserSettings from "./UserSettings";
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -44,14 +45,21 @@ export default function Layout({ children }: LayoutProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <Typography code className="text-2xl font-extrabold cursor-pointer
+              <Typography
+                code
+                className="text-2xl font-extrabold cursor-pointer
                 hover:text-primary
-                transition">
-              Sourcely</Typography>
+                transition"
+              >
+                Sourcely
+              </Typography>
             </motion.label>
             <nav className="flex items-center space-x-2  md:space-x-4 lg:space-x-6">
               {isAuthenticated ? (
-                <LogoutButton />
+                <>
+                  <LogoutButton />
+                  <UserSettings />
+                </>
               ) : (
                 <>
                   <Button
@@ -61,8 +69,7 @@ export default function Layout({ children }: LayoutProps) {
                     Sign In
                   </Button>
                   <Button
-                  
-                  typographyProps={{ className: "" }}
+                    typographyProps={{ className: "" }}
                     onClick={() => navigate("/register")}
                     theme="secondary"
                   >

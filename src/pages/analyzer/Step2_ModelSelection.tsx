@@ -2,8 +2,8 @@ import { Paper, Box, Alert } from "@mui/material";
 import Typography from "../../components/atoms/Typography";
 import { CustomButton } from "../../components/atoms/CustomButton";
 import { useCallback, useEffect, useState } from "react";
-import api from "../../api/axiosClient";
 import ModelCardSkeleton from "./ModelCardSkeleton";
+import * as analysisService from "../../api/analysisService";
 
 export type AiModel = {
   id: string;
@@ -31,14 +31,15 @@ export const Step2_ModelSelection = ({
   const [error, setError] = useState<string | null>(null);
 
   // We wrap the fetch logic in useCallback so the Retry button doesn't cause re-renders
-  const fetchModels = useCallback(async () => {
+const fetchModels = useCallback(async () => {
     setIsFetching(true);
     setError(null);
     try {
-      // We use a generic for type-safe response data.
-      const response = await api.get<AiModel[]>("/code/models");
+      // ✅ 2. USE THE CLEAN SERVICE FUNCTION
+      const response = await analysisService.getModels();
       setModels(response.data);
-    } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
       console.error("Failed to fetch models:", err);
       setError(
         "Could not load AI models. Please check the network and try again."
@@ -48,10 +49,11 @@ export const Step2_ModelSelection = ({
     }
   }, []);
 
-  // --- TRIGGER THE FETCH ON COMPONENT MOUNT ---
   useEffect(() => {
     fetchModels();
   }, [fetchModels]); // This effect runs once when the component mounts.
+
+  
   const renderContent = () => {
     // 1. Loading State
     if (isFetching) {

@@ -1,0 +1,124 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+@keyframes pan-grid {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+/* Optional: smooth scroll on navigation */
+html {
+  scroll-behavior: smooth;
+}
+
+@font-face {
+  font-family: Code;
+  font-style: normal;
+  font-weight: 100 900;
+  src: url("./fonts/SourceCode/SourceCodePro-VariableFont_wght.ttf") format("woff2");
+}
+@font-face {
+  font-family: Code;
+  font-style: italic;
+  font-weight: 100 900;
+  src: url("./fonts/SourceCode/SourceCodePro-Italic-VariableFont_wght.ttf") format("woff2");
+}
+@font-face {
+  font-family: WorkSans;
+  font-style: normal;
+  font-weight: 100 900;
+  src: url("./fonts/WorkSans/WorkSans-VariableFont_wght.ttf") format("woff2");
+}
+@font-face {
+  font-family: WorkSans;
+  font-style: italic;
+  font-weight: 100 900;
+  src: url("./fonts/WorkSans/WorkSans-Italic-VariableFont_wght.ttf") format("woff2");
+}
+
+@theme {
+  --font-code: "Code", system-ui, sans-serif;
+  --font-sans: "WorkSans", system-ui, sans-serif;
+
+  /* Primary */
+  --color-primary: #a3f1e7;
+  --color-primary-hover: #3cb9bc;
+  --color-primary-disabled: #a5e8e9;
+
+  /* Secondary */
+  --color-secondary: #622ced;
+  --color-secondary-hover: #c43c8d;
+  --color-secondary-disabled: #f0aad1;
+
+  /* Success */
+  --color-success: #4caf50;
+  --color-success-hover: #3e8e42;
+  --color-success-disabled: #a9d6aa;
+
+  /* Warning */
+  --color-warning: #ff9800;
+  --color-warning-hover: #e68900;
+  --color-warning-disabled: #ffd18a;
+
+  /* Error */
+  --color-error: #f44336;
+  --color-error-hover: #d32f2f;
+  --color-error-disabled: #f7a5a0;
+
+  /* Backgrounds */
+  --color-bg-default: #e9edf3;
+  --color-bg-paper: #ffffff;
+  --color-bg-default-light: #e9edf3;
+  --color-bg-hover: #f0f2f5;
+
+  /* Text */
+  --color-text-primary: #061e1c;
+  --color-text-primary-light: #061e1c;
+  --color-text-secondary: #5a6b85;
+  --color-text-disabled: #9aa3b1;
+  --color-text-invert: #e1f9f7;
+
+  --color-button-text-primary: #061e1c;
+  --color-button-text-secondary: #5a6b85;
+  --color-button-text-disabled: #9aa3b1;
+
+  /* Borders */
+  --color-border: #d6dce5;
+  --color-border-dark: #061e1c;
+
+  /* Elevation / shadows - optional customizations */
+  --elevation-1: 0px 1px 3px rgba(0, 0, 0, 0.08);
+  --elevation-2: 0px 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.dark {
+
+    --color-primary: #62d9ca;
+    --color-secondary: #7a4fe6;
+
+  --color-bg-default: #10151d;
+  --color-bg-default-dark: #10151d;
+  --color-bg-paper: #192532;
+  --color-bg-hover: #223344;
+
+  --color-text-primary: #e1f9f7;
+  --color-text-primary-bright: #e1f9f7;
+  --color-text-secondary: #b4becb;
+  --color-text-disabled: #7c8a9a;
+
+  --color-button-text-primary: #061e1c;
+  --color-button-text-secondary: #b4becb;
+  --color-button-text-disabled: #7c8a9a;
+
+  --color-border: #2f3b4a;
+
+  /* You can slightly darken hover variants in dark mode too */
+  --color-primary-hover: #47bfc1;
+  --color-secondary-hover: #b73884;
+  --color-success-hover: #3e8e42;
+  --color-warning-hover: #cc7c00;
+  --color-error-hover: #b71c1c;
+}

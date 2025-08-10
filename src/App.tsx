@@ -21,15 +21,15 @@ function App() {
         <Route path="/theme" element={<ThemeTest />} />
         <Route path="/testanalysis" element={<AnalysisDisplayTest />} />
 
-        
+
         <Route path="/register" element={<RegisterPage />} />
 
-          <Route path="/settings" element={<SettingsPage />}>
+          <PrivateRoute><Route path="/settings" element={<SettingsPage />}>
             {/* Redirects /settings to /settings/profile by default */}
             <Route index element={<Navigate to="profile" replace />} /> 
             <Route path="profile" element={<ProfileSettings />} />
             <Route path="repositories" element={<AnalysesSettings />} />
-          </Route>
+          </Route></PrivateRoute>
       </Routes>
     </Layout>
   );

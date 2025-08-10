@@ -177,7 +177,7 @@ export default function ThemeTest() {
               slotProps={{
                 inputLabel: {
                   component: Typography,
-                  code: true, // <-- TS now accepts this
+                  // code: true, // <-- TS now accepts this
                 },
                 input: { className: "rounded-md border border-border" },
               }}

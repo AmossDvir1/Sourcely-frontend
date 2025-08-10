@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { CustomButton as Button } from '../../components/atoms/CustomButton';
 import RepoCard from '../../components/RepoCard';
@@ -7,13 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import * as analysisService from '../../api/analysisService';
 import type { SavedAnalysis } from '../../api/analysisService';
 import { Alert, CircularProgress } from '@mui/material';
-
-// Mock data - replace with an API call
-const mockRepos = [
-  { id: 1, name: 'google/gemini-api', status: 'Completed', lastAnalyzed: '2025-08-01' },
-  { id: 2, name: 'facebook/react', status: 'Completed', lastAnalyzed: '2025-07-28' },
-  { id: 3, name: 'my-org/internal-project', status: 'Failed', lastAnalyzed: '2025-07-25' },
-];
 
 
 const AnalysesSettings = () => {

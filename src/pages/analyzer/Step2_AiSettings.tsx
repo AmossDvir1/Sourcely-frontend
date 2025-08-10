@@ -93,7 +93,7 @@ export const Step2_AiSettings: React.FC<AiSettingsProps> = ({
     }
   }, [models, setSelectedModel]);
 
-  const handleExtensionChange = (event: React.MouseEvent<HTMLElement>, newSelection: string[]) => {
+  const handleExtensionChange = (_: React.MouseEvent<HTMLElement>, newSelection: string[]) => {
     if (newSelection.includes("All") && !includedExtensions.includes("All")) {
       setIncludedExtensions(["All", ...availableExtensions]);
       return;
@@ -117,7 +117,7 @@ export const Step2_AiSettings: React.FC<AiSettingsProps> = ({
     setIncludedExtensions(selectionWithoutAll);
   };
 
-  const handleContentTypeChange = (event: React.MouseEvent<HTMLElement>, newSelection: string[]) => {
+  const handleContentTypeChange = (_: React.MouseEvent<HTMLElement>, newSelection: string[]) => {
     if (newSelection.includes("All") && !contentTypes.includes("All")) {
       setContentTypes(["All", ...individualContentTypes]);
       return;

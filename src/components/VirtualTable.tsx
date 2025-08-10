@@ -1,11 +1,19 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Box } from '@mui/material';
 
 // Define the component's generic props
 export interface VirtualTableProps<T> {
   items: T[];
-  rowHeight: number; // Each row must have a fixed height
-  height: number;    // The total height of the visible container
+  /**
+   * The fixed height of each row in pixels. For responsiveness, you might
+   * want to adjust this value based on screen size in the parent component.
+   */
+  rowHeight: number;
+  /**
+   * The total height of the visible container in pixels. This should be
+   * managed responsively in the parent component to ensure it looks good
+   * on different device sizes (e.g., smaller height on mobile).
+   */
+  height: number;
   selectedId: string | number | null;
   onRowClick: (item: T) => void;
   // Render Prop: A function that tells the table HOW to render a single row
@@ -13,7 +21,7 @@ export interface VirtualTableProps<T> {
     item: T;
     style: React.CSSProperties;
     isSelected: boolean;
-    onClick: () => void; 
+    onClick: () => void;
   }) => React.ReactNode;
 }
 
@@ -28,10 +36,9 @@ export const VirtualTable = <T extends { id: string | number }>({
   const [scrollTop, setScrollTop] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // The core virtualization logic
+  // The core virtualization logic remains unchanged
   const startIndex = Math.floor(scrollTop / rowHeight);
   const visibleCount = Math.ceil(height / rowHeight);
-  // Add a buffer of items to render above and below for smoother scrolling
   const buffer = 5;
   const endIndex = Math.min(items.length, startIndex + visibleCount + buffer);
 
@@ -42,23 +49,18 @@ export const VirtualTable = <T extends { id: string | number }>({
   }, []);
 
   return (
-    <Box
+    // Converted the MUI Box to a standard div with Tailwind classes.
+    // The dynamic height is now applied via the style attribute.
+    <div
       ref={containerRef}
       onScroll={handleScroll}
-      sx={{
-        height: `${height}px`,
-        overflowY: 'auto',
-        position: 'relative',
-        border: '1px solid',
-        borderColor: 'var(--color-border)',
-        borderRadius: '8px',
-      }}
+      className="overflow-y-auto relative border border-[var(--color-border)] rounded-lg"
+      style={{ height: `${height}px` }}
     >
-      {/* This invisible inner div creates the full scroll height */}
-      <Box sx={{ height: `${items.length * rowHeight}px`, position: 'relative' }}>
+      {/* This invisible inner div creates the full scroll height. Converted to a div for consistency. */}
+      <div style={{ height: `${items.length * rowHeight}px`, position: 'relative' }}>
         {visibleItems.map((item, index) => {
           const itemIndex = startIndex + index;
-          // ✅ 2. CALL renderRow WITH THE CORRECT, SEPARATED PROPS
           return renderRow({
             item,
             isSelected: selectedId === item.id,
@@ -68,13 +70,14 @@ export const VirtualTable = <T extends { id: string | number }>({
               left: 0,
               right: 0,
               height: `${rowHeight}px`,
+              // Add width 100% to ensure rows fill the container, which is a robust pattern.
+              width: '100%',
             },
-            // Pass the specific click handler for this row
             onClick: () => onRowClick(item),
           });
         })}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };
 

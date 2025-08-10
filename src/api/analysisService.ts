@@ -33,7 +33,7 @@ export interface SavedAnalysis {
  * Fetches the list of file extensions from a repository for masking.
  */
 export const getRepoFileExtensions = (githubUrl: string) => {
-  return api.post<{ extensions: string[] }>("/code/prepare-analysis", { githubUrl });
+  return api.post<{ extensions: string[]; repoName: string }>("/code/prepare-analysis", { githubUrl });
 };
 
 
@@ -50,7 +50,7 @@ export const getModels = () => {
 export const analyzeRepo = (
   githubUrl: string, 
   modelId: string, 
-  settings: { contentType: string[]; includedExtensions: string[] }
+  settings: { contentType: string[]; includedExtensions: string[] | null }
 ) => {
   // The backend will eventually use contentType, but for now we send the file mask
   return api.post<AnalysisResponse>("/code/analyze", { 

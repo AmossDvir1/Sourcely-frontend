@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, CircularProgress, Alert } from "@mui/material";
+import { CircularProgress, Alert } from "@mui/material";
 import Typography from "../../components/atoms/Typography";
 import { CustomButton as Button } from "../../components/atoms/CustomButton";
 import * as analysisService from "../../api/analysisService";
@@ -12,69 +12,76 @@ const DEFAULT_MODEL_ID = "models/gemini-2.0-flash-lite";
 // --- PROPS DEFINITION ---
 export interface AnalysisSettings {
   contentType: string[];
-  includedExtensions: string[];
+  includedExtensions: string[] | null;
   modelId: string;
 }
 
 type AiSettingsProps = {
   repoUrl: string;
+  repoName: string;
   onAnalyze: (settings: AnalysisSettings) => void;
   onBack: () => void;
-  isLoading: boolean; // This is the final analysis loading state from the parent
+  isLoading: boolean;
+  setSelectedModel: (modelId: string) => void;
+  selectedModel: string;
+  setRepoName: (name: string) => void;
 };
+
+const individualContentTypes = [
+  "General Description",
+  "instructions-file",
+  "Project File Tree",
+];
 
 export const Step2_AiSettings: React.FC<AiSettingsProps> = ({
   repoUrl,
+  repoName,
   onAnalyze,
   onBack,
   isLoading,
+  setSelectedModel,
+  selectedModel,
+  setRepoName
 }) => {
-  // --- STATE MANAGEMENT ---
+  // --- STATE MANAGEMENT (No changes needed here) ---
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [models, setModels] = useState<AiModel[]>([]);
-
-  // Data state
   const [availableExtensions, setAvailableExtensions] = useState<string[]>([]);
+  const [contentTypes, setContentTypes] = useState<string[]>([...individualContentTypes, "All"]);
+  const [includedExtensions, setIncludedExtensions] = useState<string[]>([
+    "All",
+  ]);
 
-  // User selections
-  const [contentTypes, setContentTypes] = useState<string[]>(['All']);
-  const [selectedModel, setSelectedModel] = useState<string>("");
-  const [includedExtensions, setIncludedExtensions] = useState<Set<string>>(
-    new Set()
-  );
-
-  // --- DATA FETCHING ---
+  // --- DATA FETCHING & EVENT HANDLERS (No changes needed here) ---
   const fetchData = useCallback(async () => {
     setIsFetching(true);
     setError(null);
     try {
-      // Fetch models and file extensions in parallel for efficiency
       const [modelsResponse, extensionsResponse] = await Promise.all([
         analysisService.getModels(),
         analysisService.getRepoFileExtensions(repoUrl),
       ]);
+      const fetchedExtensions = extensionsResponse.data.extensions;
+      const fetchedRepoName = extensionsResponse.data.repoName;
+
       setModels(modelsResponse.data);
-      setAvailableExtensions(extensionsResponse.data.extensions);
-      // Default to all extensions being selected
-      setIncludedExtensions(new Set(extensionsResponse.data.extensions));
+      setAvailableExtensions(fetchedExtensions);
+      setRepoName(fetchedRepoName);
+      setIncludedExtensions(["All", ...fetchedExtensions]);
     } catch (err) {
       console.error("Failed to fetch settings data:", err);
-      setError(
-        "Could not load repository data or AI models. Please try again."
-      );
+      setError("Could not load repository data or AI models. Please try again.");
     } finally {
       setIsFetching(false);
     }
-  }, [repoUrl]);
+  }, [repoUrl, setRepoName]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   useEffect(() => {
-    // If models are fetched, set the default selected model as "models/gemini-2.0-flash-lite",
-    // fallback to the first model in the list, fallback to an empty string, if not- set selectedModel to an empty string
     if (models?.length === 0) {
       setSelectedModel("");
     } else {
@@ -84,60 +91,61 @@ export const Step2_AiSettings: React.FC<AiSettingsProps> = ({
           ""
       );
     }
-  }, [models]);
+  }, [models, setSelectedModel]);
 
-  // --- EVENT HANDLERS ---
-  const handleExtensionChange = (extension: string) => {
-    setIncludedExtensions((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(extension)) {
-        newSet.delete(extension);
-      } else {
-        newSet.add(extension);
-      }
-      return newSet;
-    });
-  };
-
-  const handleSelectAllChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    if (event.target.checked) {
-      // If "All" is checked, select all available extensions
-      setIncludedExtensions(new Set(availableExtensions));
-    } else {
-      // If "All" is unchecked, clear all selections
-      setIncludedExtensions(new Set());
-    }
-  };
-
-  const handleContentTypeChange = (
-    event: React.MouseEvent<HTMLElement>,
-    newSelection: string[]
-  ) => {
-    // If the user selects "All", it should be the only item selected.
-    // We check if "All" was just added to the selection.
-    if (newSelection.includes('All') && !contentTypes.includes('All')) {
-      setContentTypes(['All']);
+  const handleExtensionChange = (event: React.MouseEvent<HTMLElement>, newSelection: string[]) => {
+    if (newSelection.includes("All") && !includedExtensions.includes("All")) {
+      setIncludedExtensions(["All", ...availableExtensions]);
       return;
     }
-
-    // If the user clicks any other button, "All" should be removed.
-    const selectionWithoutAll = newSelection.filter(item => item !== 'All');
-
-    // If the user deselects everything, default back to "All".
-    if (selectionWithoutAll.length === 0) {
-      setContentTypes(['All']);
-    } else {
-      setContentTypes(selectionWithoutAll);
+    const selectionWithoutAll = newSelection.filter((item) => item !== "All");
+    if (selectionWithoutAll.length === availableExtensions.length) {
+      setIncludedExtensions(["All", ...availableExtensions]);
+      return;
     }
+    if (selectionWithoutAll.length === 0 && newSelection.length === 0) {
+      setIncludedExtensions(["All", ...availableExtensions]);
+      return;
+    }
+    if (includedExtensions.length === availableExtensions.length + 1) {
+      const itemToSelect = availableExtensions.filter(
+        (item) => !selectionWithoutAll.includes(item)
+      );
+      setIncludedExtensions([...(itemToSelect ?? "All")]);
+      return;
+    }
+    setIncludedExtensions(selectionWithoutAll);
   };
-  
+
+  const handleContentTypeChange = (event: React.MouseEvent<HTMLElement>, newSelection: string[]) => {
+    if (newSelection.includes("All") && !contentTypes.includes("All")) {
+      setContentTypes(["All", ...individualContentTypes]);
+      return;
+    }
+    const selectionWithoutAll = newSelection.filter((item) => item !== "All");
+    if (selectionWithoutAll.length === individualContentTypes.length) {
+      setContentTypes(["All", ...individualContentTypes]);
+      return;
+    }
+    if (selectionWithoutAll.length === 0 && newSelection.length === 0) {
+      setContentTypes(["All", ...individualContentTypes]);
+      return;
+    }
+    if (contentTypes.length === individualContentTypes.length + 1) {
+      const itemToSelect = individualContentTypes.filter(
+        (item) => !selectionWithoutAll.includes(item)
+      );
+      setContentTypes(itemToSelect);
+      return;
+    }
+    setContentTypes(selectionWithoutAll);
+  };
+
   const handleAnalyzeClick = () => {
+    const extensionsPayload = includedExtensions.includes("All") ? null : includedExtensions;
     onAnalyze({
       modelId: selectedModel,
-      includedExtensions: Array.from(includedExtensions),
-      // Pass the content types array directly
+      includedExtensions: extensionsPayload,
       contentType: contentTypes,
     });
   };
@@ -146,21 +154,10 @@ export const Step2_AiSettings: React.FC<AiSettingsProps> = ({
   if (isFetching) return <CircularProgress />;
   if (error) return <Alert severity="error">{error}</Alert>;
 
-  //   if (error) {
-  //     return (
-  //       <Alert
-  //         severity="error"
-  //         action={<Button onClick={fetchData}>Retry</Button>}
-  //       >
-  //         {error}
-  //       </Alert>
-  //     );
-  //   }
-
   return (
     <div className="w-full max-w-3xl animate-fade-in space-y-4">
-      <Box className="text-center mb-8">
-        <Typography variant="h4" component="h2" className="!font-bold">
+      <div className="text-center mb-6 sm:mb-8">
+        <Typography variant="h4" component="h2" className="!font-bold !text-2xl sm:!text-3xl lg:!text-4xl">
           AI Analysis Settings
         </Typography>
         <Typography
@@ -168,28 +165,31 @@ export const Step2_AiSettings: React.FC<AiSettingsProps> = ({
           color="text.secondary"
           className="mt-2 truncate"
         >
-          Analyzing: <span className="font-mono">{repoUrl}</span>
+          Analyzing: <span className="font-mono">{repoName ?? repoUrl}</span>
         </Typography>
-      </Box>
+      </div>
 
-      {/* --- RENDER THE EXTRACTED COMPONENTS --- */}
       <BasicSettings
         selectedTypes={contentTypes}
         onChange={handleContentTypeChange}
+        contentTypes={individualContentTypes}
       />
       <AdvancedSettings
         models={models}
         selectedModel={selectedModel}
         onSelectModel={setSelectedModel}
         availableExtensions={availableExtensions}
-        includedExtensions={includedExtensions}
+        selectedExtensions={includedExtensions}
         onExtensionChange={handleExtensionChange}
-        onSelectAllChange={handleSelectAllChange}
       />
 
-      {/* --- Action Buttons --- */}
-      <Box className="flex justify-between items-center mt-8">
-        <Button variant="text" onClick={onBack} disabled={isLoading}>
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-between items-center gap-4 mt-6 sm:mt-8">
+        <Button
+          variant="text"
+          onClick={onBack}
+          disabled={isLoading}
+          className="w-full sm:w-auto"
+        >
           Back
         </Button>
         <Button
@@ -198,10 +198,11 @@ export const Step2_AiSettings: React.FC<AiSettingsProps> = ({
           onClick={handleAnalyzeClick}
           disabled={!selectedModel || isLoading}
           loading={isLoading}
+          className="w-full sm:w-auto"
         >
           Analyze Now
         </Button>
-      </Box>
+      </div>
     </div>
   );
 };

@@ -51,6 +51,7 @@ html {
 
   /* Secondary */
   --color-secondary: #622ced;
+    --color-secondary-rgb: 98, 44, 237;
   --color-secondary-hover: #c43c8d;
   --color-secondary-disabled: #f0aad1;
 
@@ -127,4 +128,14 @@ html {
   --color-success-hover: #3e8e42;
   --color-warning-hover: #cc7c00;
   --color-error-hover: #b71c1c;
+}
+
+@keyframes blinking-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.blinking-cursor {
+  font-weight: 500;
+  animation: blinking-cursor 1.2s step-end infinite;
 }

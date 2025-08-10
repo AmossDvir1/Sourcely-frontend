@@ -35,7 +35,7 @@ const Typography: React.FC<TypographyProps> = ({
 
   return (
     <MuiTypography
-      className={clsx(fontClass, trackingClass, leadingClass, className)}
+      className={clsx("cursor-default", fontClass, trackingClass, leadingClass, className)}
       color={'text.primary'}
       {...rest}
     />

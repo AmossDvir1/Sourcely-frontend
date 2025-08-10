@@ -2,46 +2,38 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  ToggleButtonGroup,
-  ToggleButton,
 } from "@mui/material";
 import Typography from "../../../components/atoms/Typography";
+import { TitledToggleButtonGroup } from "../../../components/TitledToggleButtonGroup";
 
 type BasicSettingsProps = {
-  selectedTypes: string[]; // Expects an array of strings
+  selectedTypes: string[];
   onChange: (
     event: React.MouseEvent<HTMLElement>,
     newSelection: string[]
   ) => void;
+  contentTypes: string[];
 };
 
 export const BasicSettings = ({
   selectedTypes,
   onChange,
+  contentTypes
 }: BasicSettingsProps) => {
-const isAllSelected = selectedTypes.includes('All');
-
- return (
+  return (
     <Accordion defaultExpanded>
       <AccordionSummary sx={{ pointerEvents: 'none' }}>
         <Typography variant="h6">Basic Settings</Typography>
       </AccordionSummary>
       <AccordionDetails>
-        <Typography gutterBottom>Generated Content</Typography>
-        <ToggleButtonGroup
-          value={selectedTypes} // Pass the array directly
-          onChange={onChange}    // Pass the handler directly
-          color="primary"
-          aria-label="generated content type"
-        >
-          {/* The disabled logic remains the same */}
-          <ToggleButton disableRipple value="All" disabled={isAllSelected}>
-            All
-          </ToggleButton>
-          <ToggleButton disableRipple value="General Description">Description</ToggleButton>
-          <ToggleButton disableRipple value="instructions-file">Instructions</ToggleButton>
-          <ToggleButton disableRipple value="Project File Tree">File Tree</ToggleButton>
-        </ToggleButtonGroup>
+        {/* The old ToggleButtonGroup is replaced with our new, clean component */}
+        <TitledToggleButtonGroup
+          title="Generated Content"
+          ariaLabel="generated content type"
+          options={contentTypes}
+          selection={selectedTypes}
+          onChange={onChange}
+        />
       </AccordionDetails>
     </Accordion>
   );

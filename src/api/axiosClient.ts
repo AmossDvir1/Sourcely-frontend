@@ -6,7 +6,7 @@ const baseURL = `${import.meta.env.VITE_API_BASE_URL}/api/${import.meta.env.VITE
 
 const api = axios.create({
   baseURL,
-  withCredentials: true, // ✅ Needed for cookies
+  withCredentials: true, // Needed for cookies
 });
 
 // Attach access token to every request
@@ -22,18 +22,46 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+let isRefreshing = false;
+// A queue of failed requests to be retried after token refresh
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let failedQueue: { resolve: (value: unknown) => void; reject: (reason?: any) => void }[] = [];
+
+const processQueue = (error: Error | null, token: string | null = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+
+  failedQueue = [];
+};
+
 // Handle 401 & auto-refresh
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // ✅ FIX 1: Add a condition to check that the failed request was NOT the refresh endpoint.
-    // This is the most critical change to prevent the infinite loop.
-    const isRefreshFailure = originalRequest.url.includes('/auth/refresh');
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      // If a refresh is already in progress, queue the current request
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then(token => {
+            originalRequest.headers['Authorization'] = 'Bearer ' + token;
+            return api(originalRequest);
+          })
+          .catch(err => {
+            return Promise.reject(err);
+          });
+      }
 
-    if (error.response?.status === 401 && !originalRequest._retry && !isRefreshFailure) {
       originalRequest._retry = true;
+      isRefreshing = true;
 
       try {
         console.log("Access token expired. Attempting to refresh...");
@@ -41,23 +69,30 @@ api.interceptors.response.use(
         const { access_token } = res.data;
 
         storage.setItem(AUTH_TOKEN_KEY, access_token);
-        console.log("Token refresh successful. Retrying original request.");
+        console.log("Token refresh successful. Retrying original and queued requests.");
+        
+        // Apply the new token to the header of the original failed request
+        api.defaults.headers.common['Authorization'] = 'Bearer ' + access_token;
+        originalRequest.headers['Authorization'] = 'Bearer ' + access_token;
 
-        // Retry original request with new token
-        originalRequest.headers['Authorization'] = `Bearer ${access_token}`;
+        // Process the queue with the new token
+        processQueue(null, access_token);
+        
+        // Retry the original request
         return api(originalRequest);
 
-      } catch (refreshError) {
-        // ✅ FIX 2: If the refresh itself fails, the user is truly unauthenticated.
-        // We must log them out completely on the client side.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (refreshError: any) {
         console.error("Token refresh failed. User is unauthenticated. Logging out.", refreshError);
+        processQueue(refreshError, null); // Reject all queued requests
         storage.removeItem(AUTH_TOKEN_KEY);
-        window.location.href = '/login'; // Force a redirect to the login page.
+        window.location.href = '/login'; // Force a redirect
         return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 
-    // If the error is not a 401 or if it's a refresh failure, just reject it.
     return Promise.reject(error);
   }
 );

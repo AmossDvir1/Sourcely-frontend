@@ -10,12 +10,14 @@ type ModelSelectionProps = {
   models: AiModel[];
   selectedModel: string;
   onSelect: (modelId: string) => void;
+  height: number;
 };
 
 const ModelSelection = ({
   models,
   selectedModel,
   onSelect,
+  height
 }: ModelSelectionProps) => {
 
   const renderModelRow = ({
@@ -77,7 +79,7 @@ const ModelSelection = ({
       <VirtualTable
         items={models}
         rowHeight={120} // We've decided each row will be 70px tall
-        height={350} // The scrollable container will be 350px tall
+        height={height} // The scrollable container will be 350px tall
         selectedId={selectedModel}
         onRowClick={(item) => onSelect(item.id)}
         renderRow={renderModelRow} // Pass our custom row renderer

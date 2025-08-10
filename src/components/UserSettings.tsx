@@ -2,14 +2,13 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { useAuth } from "../hooks/useAuth"; // Assuming useAuth provides user info
 import { CustomButton as Button } from "./atoms/CustomButton";
 
 export default function UserSettings() {
-//   const { user } = useAuth(); // Destructure user if you need it for the avatar
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const navigate = useNavigate();
+
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -28,13 +27,9 @@ export default function UserSettings() {
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}
       >
-        {/* You can use a user avatar or a settings icon */}
-        {/* For example, if user object has a name: */}
-        {/* <Avatar sx={{ width: 32, height: 32 }}>{user?.name?.charAt(0)}</Avatar> */}
         <SettingsIcon className="text-gray-600 dark:text-gray-300 hover:text-primary dark:hover:text-primary transition-colors" />
       </IconButton>
       <Menu
-        className="flex flex-col items-center justify-center bg-transparent"
         id="account-menu"
         anchorEl={anchorEl}
         open={open}
@@ -43,25 +38,17 @@ export default function UserSettings() {
         slotProps={{
           paper: {
             elevation: 0,
+            // Most styles are now converted to Tailwind classes for responsiveness and consistency.
+            className:
+              "flex flex-col items-center justify-center rounded-xl overflow-visible " +
+              "outline outline-1 outline-[var(--color-secondary)] " +
+              "bg-[var(--color-bg-glass)]/25 backdrop-blur-sm " +
+              "border border-[var(--color-border-glass)] shadow-[0_4px_15px_rgba(0,0,0,0.15)] " +
+              "p-5 sm:p-6 md:p-8", // Responsive padding
             sx: {
-              padding: "30px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: "12px",
-              overflow: "visible",
-                outline: "1px solid var(--color-secondary)",
-              // filter: `drop-shadow(0px 2px 8px var(--color-primary))`,
-              // boxShadow: 'inset 0 2px 8px 0 var(--color-primary)',
-
-              mt: 2,
-              //   bgcolor: 'transparent',
-              backgroundColor: "rgb(from var(--color-bg-glass) r g b / 25%)",
-
-              backdropFilter: "blur(4px)",
-              border: "1px solid var(--color-border-glass)",
-              boxShadow: "0 4px 15px rgba(0, 0, 0, 0.15)",
-
+              // The sx prop is still useful for things Tailwind can't easily handle,
+              // like child component selectors or simple margin-top.
+              mt: 1.5,
               "& .MuiAvatar-root": {
                 width: 32,
                 height: 32,
@@ -71,24 +58,27 @@ export default function UserSettings() {
             },
           },
           list: {
-            className: "flex flex-col items-center justify-center px-4 m-0",
+            // List styling is also cleaner in className.
+            className: "flex flex-col items-center justify-center p-0 m-0 w-full",
           },
         }}
         transformOrigin={{ horizontal: "center", vertical: "top" }}
         anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
       >
         <MenuItem
-          className="flex items-center justify-center  my-2"
-          size="small"
+          // Added w-full to the button component via its parent.
+          // Adjusted vertical margin for a better fit on mobile.
+          className="flex items-center justify-center w-full my-1.5 sm:my-2"
           component={Button}
+          size="small"
           onClick={() => navigate("/settings/profile")}
         >
           Profile
         </MenuItem>
         <MenuItem
-          className="flex items-center justify-center  my-2"
-          size="small"
+          className="flex items-center justify-center w-full my-1.5 sm:my-2"
           component={Button}
+          size="small"
           onClick={() => navigate("/settings/repositories")}
         >
           My Analyses

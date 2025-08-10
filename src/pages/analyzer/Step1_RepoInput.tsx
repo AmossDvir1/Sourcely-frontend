@@ -2,9 +2,9 @@ import { useState } from "react";
 import { TextField } from "@mui/material";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import { CustomButton } from "../../components/atoms/CustomButton";
+import Typography from "../../components/atoms/Typography";
 
 type Props = {
-  // Callback function to pass the submitted URL up to the parent
   onUrlSubmit: (url: string) => void;
 };
 
@@ -32,10 +32,10 @@ export const Step1_RepoInput = ({ onUrlSubmit }: Props) => {
 
   return (
     <div className="text-center w-full max-w-2xl">
-      <h1 className="text-4xl sm:text-5xl font-bold">Sourcely</h1>
-      <p className="text-lg text-gray-400 mt-2 mb-8">
+      <Typography className="text-4xl sm:text-5xl font-medium">Sourcely</Typography>
+      <Typography className="text-base sm:text-lg text-gray-400 mt-2 mb-8 font-sans">
         Get an instant AI-powered summary of any public GitHub repository.
-      </p>
+      </Typography>
       <form
         onSubmit={handleSubmit}
         className="flex flex-col items-center gap-4"
@@ -48,16 +48,17 @@ export const Step1_RepoInput = ({ onUrlSubmit }: Props) => {
           error={!!error}
           helperText={error || " "}
           onChange={(e) => handleChange(e.target.value)}
-          slotProps={{input: {startAdornment: (
+          InputProps={{
+            startAdornment: (
               <GitHubIcon sx={{ mr: 1, color: "text.secondary" }} />
-            )}}}
+            ),
+          }}
         />
         <CustomButton
           type="submit"
-          // theme="secondary"
           size="large"
           disabled={!url}
-          className="w-48 !h-12 !font-semibold"
+          className="w-full sm:w-48 !h-12 !font-semibold"
         >
           Next
         </CustomButton>

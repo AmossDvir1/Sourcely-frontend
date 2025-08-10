@@ -15,9 +15,10 @@ type AnalysisStep = "INPUT" | "MODEL_SELECTION" | "RESULT";
 const Analyzer: React.FC = () => {
   const [step, setStep] = useState<AnalysisStep>("INPUT");
   const [sourceCode, setSourceCode] = useState<string | null>(null);
+  const [selectedModel, setSelectedModel] = useState<string>("");
+  const [repoName, setRepoName] = useState<string>("");
 
   const [url, setUrl] = useState("");
-  const [model, setModel] = useState("");
   const [analysis, setAnalysis] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -28,19 +29,23 @@ const Analyzer: React.FC = () => {
     setStep("MODEL_SELECTION");
   };
 
- const handleAnalyze = async (settings: AnalysisSettings) => {
+  const handleAnalyze = async (settings: AnalysisSettings) => {
     setIsLoading(true);
     setError(null);
 
     try {
-
-      const response = await analysisService.analyzeRepo(url, settings.modelId, {contentType: settings.contentType, includedExtensions:settings.includedExtensions});
+      const response = await analysisService.analyzeRepo(
+        url,
+        settings.modelId,
+        {
+          contentType: settings.contentType,
+          includedExtensions: settings.includedExtensions,
+        }
+      );
       setAnalysis(response.data.analysis);
-      // You still need to manage sourceCode for the save dialog
-      setSourceCode(response.data.sourceCode); 
-      setStep('RESULT');
+      setSourceCode(response.data.sourceCode);
+      setStep("RESULT");
     } catch (err: unknown) {
-      // Handle error as unknown, optionally narrow the type
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -53,20 +58,18 @@ const Analyzer: React.FC = () => {
 
   const handleSaveAnalysis = async (data: AnalysisSaveData) => {
     if (!sourceCode) {
-        throw new Error("Source code is not available to save.");
+      throw new Error("Source code is not available to save.");
     }
-    
-    // Create the full payload for the service function
+
     const saveData = {
-        ...data,
-        sourceCode: sourceCode,
+      ...data,
+      sourceCode: sourceCode,
     };
 
     try {
       await analysisService.saveAnalysis(saveData);
-      // Optionally show a success notification (snackbar)
     } catch (error) {
-      console.error('API call to save analysis failed:', error);
+      console.error("API call to save analysis failed:", error);
       throw error;
     }
   };
@@ -74,7 +77,7 @@ const Analyzer: React.FC = () => {
   const handleReset = () => {
     setStep("INPUT");
     setUrl("");
-    setModel("");
+    setSelectedModel("");
     setAnalysis(null);
     setError(null);
   };
@@ -93,7 +96,7 @@ const Analyzer: React.FC = () => {
               size="small"
               onClick={() => {
                 setError(null);
-                setStep("MODEL_SELECTION"); // Use string literal
+                setStep("MODEL_SELECTION");
               }}
             >
               TRY AGAIN
@@ -112,23 +115,33 @@ const Analyzer: React.FC = () => {
             key="input"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
+            className="w-full"
           >
             <Step1_RepoInput onUrlSubmit={handleRepoSubmit} />
           </motion.div>
         );
       }
-       case 'MODEL_SELECTION': // This step now renders the settings component
+      case "MODEL_SELECTION":
         return (
-          <motion.div key="settings" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <motion.div
+            key="settings"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="w-full"
+          >
             <Step2_AiSettings
+              setRepoName={setRepoName}
               repoUrl={url}
+              repoName={repoName}
+              selectedModel={selectedModel}
+              setSelectedModel={setSelectedModel}
               onAnalyze={handleAnalyze}
-              onBack={() => setStep('INPUT')}
+              onBack={() => setStep("INPUT")}
               isLoading={isLoading}
             />
           </motion.div>
         );
-        
+
       case "RESULT": {
         return (
           analysis && (
@@ -136,10 +149,12 @@ const Analyzer: React.FC = () => {
               key="result"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
+              className="w-full"
             >
               <AnalysisDisplay
-                model={model}
-                repoName={url}
+                model={selectedModel}
+                repoName={repoName}
+                repoUrl={url}
                 onSave={handleSaveAnalysis}
                 analysis={analysis}
                 onReset={handleReset}
@@ -157,8 +172,8 @@ const Analyzer: React.FC = () => {
   };
 
   return (
-    <main className="min-h-full w-full flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-3xl flex flex-col items-center justify-center bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-8 shadow-lg min-h-[400px]">
+    <main className="min-h-full w-full flex flex-col items-center justify-center p-2 sm:p-4">
+      <div className="w-full max-w-3xl flex flex-col items-center justify-center backdrop-blur-sm border border-white/10 rounded-xl p-4 sm:p-8 shadow-lg min-h-[380px] sm:min-h-[400px]">
         <AnimatePresence mode="wait">{renderContent()}</AnimatePresence>
       </div>
     </main>

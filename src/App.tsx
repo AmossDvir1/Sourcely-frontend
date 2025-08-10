@@ -4,12 +4,12 @@ import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
 import Layout from "./components/Layout";
-import Analyzer from "./pages/analyzer/Analyzer";
 import "./App.css";
 import ThemeTest from "./pages/ThemeTest";
 import SettingsPage from "./pages/settings/SettingsPage";
 import AnalysesSettings from "./pages/settings/AnalysesSettings";
 import ProfileSettings from "./pages/settings/ProfileSettings";
+import AnalysisDisplayTest from "./pages/AnalysisDisplayTest";
 
 function App() {
   return (
@@ -17,7 +17,11 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
+
         <Route path="/theme" element={<ThemeTest />} />
+        <Route path="/testanalysis" element={<AnalysisDisplayTest />} />
+
+        
         <Route path="/register" element={<RegisterPage />} />
 
           <Route path="/settings" element={<SettingsPage />}>
@@ -26,14 +30,6 @@ function App() {
             <Route path="profile" element={<ProfileSettings />} />
             <Route path="repositories" element={<AnalysesSettings />} />
           </Route>
-
-        <Route path="/"
-          element={
-            <PrivateRoute>
-              <Analyzer />
-            </PrivateRoute>
-          }
-        />
       </Routes>
     </Layout>
   );

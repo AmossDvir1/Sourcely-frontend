@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import AnimatedTypography from "../components/atoms/AnimatedTypography";
 import { useResponsive } from "../hooks/useResponsive";
 import { motion } from "framer-motion";
-import GlowingSpinner from "../components/atoms/GlowingSpinner";
 
 // A simple animation variant for a staggered fade-in effect
 const FADE_IN_VARIANTS = {

@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate  } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { PrivateRoute } from "./components/PrivateRoute";
 import { LoginPage } from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
@@ -21,17 +21,15 @@ function App() {
         <Route path="/theme" element={<ThemeTest />} />
         <Route path="/testanalysis" element={<AnalysisDisplayTest />} />
 
-
         <Route path="/register" element={<RegisterPage />} />
-<Route element={<PrivateRoute />}>
+        <Route element={<PrivateRoute />}>
           <Route path="/settings" element={<SettingsPage />}>
             {/* Redirects /settings to /settings/profile by default */}
             <Route index element={<Navigate to="profile" replace />} />
             <Route path="profile" element={<ProfileSettings />} />
             <Route path="repositories" element={<AnalysesSettings />} />
           </Route>
-          </Route>
-          
+        </Route>
       </Routes>
     </Layout>
   );

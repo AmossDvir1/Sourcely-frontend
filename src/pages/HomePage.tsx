@@ -1,10 +1,18 @@
 import Typography from "../components/atoms/Typography";
-import { CustomButton as Button } from "../components/atoms/CustomButton";
+import Button from "../components/atoms/Button";
 import { useAuth } from "../hooks/useAuth";
 import Analyzer from "./analyzer/Analyzer";
 import { useNavigate } from "react-router-dom";
 import AnimatedTypography from "../components/atoms/AnimatedTypography";
 import { useResponsive } from "../hooks/useResponsive";
+import { motion } from "framer-motion";
+import GlowingSpinner from "../components/atoms/GlowingSpinner";
+
+// A simple animation variant for a staggered fade-in effect
+const FADE_IN_VARIANTS = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 },
+};
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -46,41 +54,69 @@ const HomePage: React.FC = () => {
 
   return (
     // The main container now has responsive vertical padding
-    <div className="min-h-full flex flex-col items-center justify-between px-2 sm:px-6 py-4 md:py-6 transition-colors duration-500 ">
-      <div>
-        {/* Main headline has responsive text size */}
+        <div className="min-h-full flex flex-col items-center justify-center px-2 sm:px-6 py-4 md:py-6">
+
+      {/* 1. HEADLINE: Now with a vibrant theme gradient and animation */}
+      <motion.div
+        variants={FADE_IN_VARIANTS}
+        initial="hidden"
+        animate="visible"
+        transition={{ duration: 0.5 }}
+      >
         <Typography
           code
-          className="text-3xl text-center md:text-5xl font-extrabold leading-tight"
+          className="text-3xl text-center md:text-5xl font-medium leading-tight
+                     text-text-primary"
         >
           AI-powered GitHub Repository Insights
         </Typography>
-      </div>
-      <AnimatedTypography
-        textSequence={animatedTextSequence}
-        code
-        // Container has responsive height and text size
-        className="text-base md:text-lg text-center min-h-[140px] sm:min-h-[170px] mt-4 whitespace-pre-wrap"
-        repeat={isMobile ? Infinity : 0} // Optional: repeat animation on mobile
-      />
+      </motion.div>
 
-      <Analyzer />
+      {/* 2. ANIMATED TEXT: Now with animation */}
+      <motion.div
+        className="w-full"
+        variants={FADE_IN_VARIANTS}
+        initial="hidden"
+        animate="visible"
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
+        <AnimatedTypography
+          textSequence={animatedTextSequence}
+          code
+          className="text-base md:text-lg text-text-secondary text-center min-h-[50px] sm:min-h-[120px] mt-4 whitespace-pre-wrap"
+          repeat={isMobile ? Infinity : 0}
+        />
+      </motion.div>
 
-      {isAuthenticated ? (
-        <div className="flex flex-col mt-6">
-          <Button onClick={() => navigate("/settings/repositories")}>
-            View My Analyses
-          </Button>
-        </div>
-      ) : (
-        // Action buttons stack vertically on mobile and go horizontal on larger screens
-        <div className="flex flex-col sm:flex-row gap-4 mt-6">
-          <Button onClick={() => navigate("/login")}>Sign In</Button>
-          <Button variant="outlined" onClick={() => navigate("/register")}>
-            Create Account
-          </Button>
-        </div>
-      )}
+      {/* 3. ANALYZER: Wrapped in our new cyberpunk glass container and animated */}
+      <motion.div
+        className="w-full max-w-2xl mt-4 p-4 rounded-xl
+                   "
+        variants={FADE_IN_VARIANTS}
+        initial="hidden"
+        animate="visible"
+        transition={{ duration: 0.5, delay: 0.4 }}
+      >
+        <Analyzer />
+      </motion.div>
+
+      {/* 4. AUTHENTICATED ACTIONS: Now with animation */}
+      <motion.div
+        className="mt-0 md:mt-6"
+        variants={FADE_IN_VARIANTS}
+        initial="hidden"
+        animate="visible"
+        transition={{ duration: 0.5, delay: 0.6 }}
+      >
+        {isAuthenticated && (
+          <div className="flex flex-col">
+            <Button onClick={() => navigate("/settings/repositories")}>
+              View My Analyses
+            </Button>
+            
+          </div>
+        )}
+      </motion.div>
     </div>
   );
 };

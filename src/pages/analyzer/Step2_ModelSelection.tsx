@@ -1,9 +1,9 @@
 import { Paper, Box, Alert } from "@mui/material";
 import Typography from "../../components/atoms/Typography";
-import { CustomButton } from "../../components/atoms/CustomButton";
+import Button from "../../components/atoms/Button";
 import { useCallback, useEffect, useState } from "react";
-import ModelCardSkeleton from "./ModelCardSkeleton";
 import * as analysisService from "../../api/analysisService";
+import GlowingSpinner from "../../components/atoms/GlowingSpinner";
 
 export type AiModel = {
   id: string;
@@ -31,14 +31,14 @@ export const Step2_ModelSelection = ({
   const [error, setError] = useState<string | null>(null);
 
   // We wrap the fetch logic in useCallback so the Retry button doesn't cause re-renders
-const fetchModels = useCallback(async () => {
+  const fetchModels = useCallback(async () => {
     setIsFetching(true);
     setError(null);
     try {
       // ✅ 2. USE THE CLEAN SERVICE FUNCTION
       const response = await analysisService.getModels();
       setModels(response.data);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Failed to fetch models:", err);
       setError(
@@ -53,16 +53,13 @@ const fetchModels = useCallback(async () => {
     fetchModels();
   }, [fetchModels]); // This effect runs once when the component mounts.
 
-  
   const renderContent = () => {
     // 1. Loading State
     if (isFetching) {
       return (
-        <Box className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <ModelCardSkeleton />
-          <ModelCardSkeleton />
-          <ModelCardSkeleton />
-        </Box>
+        <div className="flex items-center justify-center">
+          <GlowingSpinner></GlowingSpinner>
+        </div>
       );
     }
 
@@ -72,9 +69,9 @@ const fetchModels = useCallback(async () => {
         <Alert
           severity="error"
           action={
-            <CustomButton color="inherit" size="small" onClick={fetchModels}>
+            <Button color="inherit" size="small" onClick={fetchModels}>
               RETRY
-            </CustomButton>
+            </Button>
           }
         >
           {error}
@@ -99,7 +96,7 @@ const fetchModels = useCallback(async () => {
                 {model.description}
               </Typography>
             </div>
-            <CustomButton
+            <Button
               className="w-full mt-4"
               onClick={() => onAnalyze(model.id)}
               // Disable button if analysis is running OR if models are being fetched
@@ -107,7 +104,7 @@ const fetchModels = useCallback(async () => {
               loading={isLoading} // Show loading state on button if analysis is running
             >
               Analyze with {model.name}
-            </CustomButton>
+            </Button>
           </Paper>
         ))}
       </Box>
@@ -130,9 +127,9 @@ const fetchModels = useCallback(async () => {
       {renderContent()}
 
       <Box className="text-center mt-8">
-        <CustomButton variant="text" onClick={onBack} disabled={isLoading}>
+        <Button variant="text" onClick={onBack} disabled={isLoading}>
           Back
-        </CustomButton>
+        </Button>
       </Box>
     </div>
   );

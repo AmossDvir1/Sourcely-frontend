@@ -4,11 +4,11 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { Step1_RepoInput } from "./Step1_RepoInput";
 import { AnalysisDisplay } from "./AnalysisDisplay";
-import { AnalysisSkeleton } from "./AnalysisSkeleton";
-import { CustomButton } from "../../components/atoms/CustomButton";
+import Button from "../../components/atoms/Button";
 import type { AnalysisSaveData } from "./SaveAnalysisDialog";
 import * as analysisService from "../../api/analysisService";
 import { Step2_AiSettings, type AnalysisSettings } from "./Step2_AiSettings";
+import GlowingSpinner from "../../components/atoms/GlowingSpinner";
 
 type AnalysisStep = "INPUT" | "MODEL_SELECTION" | "RESULT";
 
@@ -84,14 +84,14 @@ const Analyzer: React.FC = () => {
 
   const renderContent = () => {
     if (isLoading) {
-      return <AnalysisSkeleton />;
+      return <div className="flex items-center justify-center"><GlowingSpinner></GlowingSpinner></div>;
     }
     if (error) {
       return (
         <Alert
           severity="error"
           action={
-            <CustomButton
+            <Button
               color="inherit"
               size="small"
               onClick={() => {
@@ -100,7 +100,7 @@ const Analyzer: React.FC = () => {
               }}
             >
               TRY AGAIN
-            </CustomButton>
+            </Button>
           }
         >
           {error}

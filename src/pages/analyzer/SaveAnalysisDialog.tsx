@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react';
 import {
-  Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  TextField,
   CircularProgress,
   Typography,
 } from '@mui/material';
-
-import { CustomButton as Button } from '../../components/atoms/CustomButton';
+import Dialog from '../../components/Dialog';
+import TextField from '../../components/atoms/TextField';
+import Button from '../../components/atoms/Button';
 
 
 // Define the shape of the data that will be saved
@@ -86,10 +85,9 @@ export const SaveAnalysisDialog: React.FC<SaveAnalysisDialogProps> = ({ open, on
           label="Analysis Name"
           type="text"
           fullWidth
-          variant="outlined"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          sx={{ mb: 2 }}
+          className="mb-2"
         />
         <TextField
           margin="dense"
@@ -99,10 +97,9 @@ export const SaveAnalysisDialog: React.FC<SaveAnalysisDialogProps> = ({ open, on
           fullWidth
           multiline
           rows={4}
-          variant="outlined"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          sx={{ mb: 2 }}
+          className="mb-2"
         />
         <TextField
           margin="dense"
@@ -110,10 +107,9 @@ export const SaveAnalysisDialog: React.FC<SaveAnalysisDialogProps> = ({ open, on
           label="Repository"
           type="text"
           fullWidth
-          variant="outlined"
           value={repoName}
           disabled
-          sx={{ mb: 2 }}
+          className="mb-2"
         />
         <TextField
           margin="dense"
@@ -121,10 +117,9 @@ export const SaveAnalysisDialog: React.FC<SaveAnalysisDialogProps> = ({ open, on
           label="Analysis Date"
           type="text"
           fullWidth
-          variant="outlined"
           value={new Date().toLocaleDateString()}
           disabled
-          sx={{ mb: 2 }}
+          className="mb-2"
         />
         <TextField
           margin="dense"
@@ -132,7 +127,6 @@ export const SaveAnalysisDialog: React.FC<SaveAnalysisDialogProps> = ({ open, on
           label="Model Used"
           type="text"
           fullWidth
-          variant="outlined"
           value={modelUsed}
           disabled
         />

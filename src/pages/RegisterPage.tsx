@@ -1,38 +1,38 @@
-// src/pages/RegisterPage.tsx
 import { useState } from "react";
-import { useAuth } from "../hooks/useAuth"; // You'll need a register function here
+import { useAuth } from "../hooks/useAuth";
 import { useNavigate, Link } from "react-router-dom";
-import { TextField, styled, Box } from "@mui/material";
+import { Box } from "@mui/material";
+import { motion } from "framer-motion";
 import { AuthLayout } from "../components/AuthLayout";
 import TerminalIcon from "@mui/icons-material/Terminal";
-import { register as apiRegister } from "../api/authService"; // Assuming you have this
+import { register as apiRegister } from "../api/authService";
 import Typography from "../components/atoms/Typography";
-import { CustomButton as Button } from "../components/atoms/CustomButton";
+// Import our reusable, themed components
+import Button from "../components/atoms/Button";
+import TextField from "../components/atoms/TextField";
 
-// Reuse the styled text field from the login page
-const StyledTextField = styled(TextField)({
-  "& .MuiInputBase-root": {
-    backgroundColor: "rgba(0,0,0,0.3)",
-    "&:hover": { backgroundColor: "rgba(0,0,0,0.5)" },
-    "&.Mui-focused": {
-      backgroundColor: "rgba(0,0,0,0.5)",
-      boxShadow: "0 0 15px rgba(51, 153, 255, 0.4)",
-    },
+// Animation variants, copied directly from LoginPage for consistency
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
   },
-  "& label.Mui-focused": { color: "#3399FF" },
-  "& .MuiOutlinedInput-root": {
-    "& fieldset": { borderColor: "rgba(255, 255, 255, 0.2)" },
-    "&:hover fieldset": { borderColor: "#3399FF" },
-    "&.Mui-focused fieldset": { borderColor: "#3399FF" },
-  },
-});
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 },
+};
+
+// The StyledTextField component is no longer needed.
 
 export const RegisterPage = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { login } = useAuth(); // We'll login immediately after successful registration
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,86 +40,106 @@ export const RegisterPage = () => {
     setError("");
     try {
       await apiRegister({ username, email, password });
-      // Automatically log the user in after they register
       await login({ email, password });
       navigate("/");
-
-      /* eslint-disable @typescript-eslint/no-explicit-any */
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     } catch (err: any) {
-      setError("Registration failed. Please try a different email.");
+      setError("Registration failed. Please try a different email or username.");
       console.error(err);
     }
   };
 
   return (
     <AuthLayout>
-      <Box component="form" onSubmit={handleSubmit} className="p-8 space-y-6">
-        <Box className="text-center mb-6">
-          <TerminalIcon sx={{ fontSize: 40, color: "#3399FF" }} />
-          <Typography component="h1" variant="h4" className="!font-bold mt-2">
+      {/* Replicate the exact motion layout from LoginPage */}
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="p-4 sm:p-8 flex flex-col gap-y-6"
+      >
+        {/* 1. THEMED HEADER */}
+        <motion.div variants={itemVariants} className="text-center">
+          <TerminalIcon sx={{ fontSize: 40, color: "var(--color-primary)" }} />
+          <Typography code className="!text-3xl !font-bold mt-2 text-text-primary">
             Create Account
           </Typography>
-          <Typography className="text-gray-400">Join Sourcely</Typography>
+          <Typography className="text-text-secondary">
+            Join to get started
+          </Typography>
+        </motion.div>
+
+        {/* 2. THEMED FORM WITH STAGGERED ANIMATIONS */}
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-y-4"
+        >
+          <motion.div variants={itemVariants}>
+            <TextField
+            autoComplete={"off"}
+            slotProps={{input:{autoComplete: "off"}}}
+              required
+              fullWidth
+              label="Username"
+              value={username}
+              onChange={(e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setUsername(e.target.value)}
+            />
+          </motion.div>
+
+          <motion.div variants={itemVariants}>
+            <TextField
+              required
+              fullWidth
+              label="Email Address"
+                          slotProps={{input:{autoComplete: "off"}}}
+
+              type="email"
+              value={email}
+              onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setEmail(e.target.value)}
+            />
+          </motion.div>
+
+          <motion.div variants={itemVariants}>
+            <TextField
+              required
+              fullWidth
+              label="Password"
+              type="password"
+                          slotProps={{input:{autoComplete: "new-password"}}}
+
+              value={password}
+              onChange={(e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setPassword(e.target.value)}
+            />
+          </motion.div>
+
+          {error && (
+            <Typography color="error" className="text-center text-sm">
+              {error}
+            </Typography>
+          )}
+
+          <motion.div variants={itemVariants}>
+            {/* Use our custom, themed Button */}
+            <Button type="submit" fullWidth size="large">
+              Create Account
+            </Button>
+          </motion.div>
         </Box>
 
-        <StyledTextField
-          label="Username"
-          required
-          fullWidth
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <StyledTextField
-          label="Email Address"
-          type="email"
-          required
-          fullWidth
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <StyledTextField
-          label="Password"
-          type="password"
-          required
-          fullWidth
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        {error && (
-          <Typography color="error" className="text-center">
-            {error}
+        {/* 3. THEMED FOOTER LINK */}
+        <motion.div variants={itemVariants}>
+          <Typography className="text-center text-text-secondary pt-4">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="font-semibold text-primary hover:underline transition-colors"
+            >
+              Sign In
+            </Link>
           </Typography>
-        )}
-
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          sx={{
-            py: 1.5,
-            fontWeight: 600,
-            transition: "all 0.3s ease",
-            boxShadow: "0 0 10px rgba(51, 153, 255, 0.5)",
-            "&:hover": {
-              boxShadow: "0 0 25px rgba(51, 153, 255, 0.8)",
-              transform: "translateY(-2px)",
-            },
-          }}
-        >
-          Create Account
-        </Button>
-
-        <Typography className="text-center text-gray-400 pt-4">
-          Already have an account?{" "}
-          <Link
-            to="/login"
-            className="font-semibold text-[#3399FF] hover:underline"
-          >
-            Sign In
-          </Link>
-        </Typography>
-      </Box>
+        </motion.div>
+      </motion.div>
     </AuthLayout>
   );
 };

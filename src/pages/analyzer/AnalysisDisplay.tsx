@@ -4,7 +4,7 @@ import { Paper, Tooltip, IconButton } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
 import { SaveAnalysisDialog, type AnalysisSaveData } from './SaveAnalysisDialog';
-import { CustomButton as Button } from '../../components/atoms/CustomButton';
+import Button from '../../components/atoms/Button';
 import Typography from '../../components/atoms/Typography';
 
 interface AnalysisDisplayProps {
@@ -75,7 +75,7 @@ export const AnalysisDisplay: React.FC<AnalysisDisplayProps> = ({ analysis, repo
 
         {/* Action buttons remain at the bottom, already responsive */}
         <div className="mt-8 text-center flex flex-col sm:flex-row justify-center items-center gap-4">
-          <Button variant="outlined" color="primary" onClick={onReset} className="w-full sm:w-auto">
+          <Button color="primary" onClick={onReset} className="w-full sm:w-auto">
             Analyze Another Repository
           </Button>
           <Button

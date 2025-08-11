@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { CustomButton as Button } from '../../components/atoms/CustomButton';
+import Button from '../../components/atoms/Button';
 import { TextField } from '@mui/material';
 import { motion } from 'framer-motion';
 import Typography from '../../components/atoms/Typography';

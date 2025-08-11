@@ -1,39 +1,26 @@
-// src/pages/LoginPage.tsx
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate, Link } from "react-router-dom";
-import { TextField, styled, Box } from "@mui/material";
+import { Box } from "@mui/material";
+import { motion } from "framer-motion";
 import Typography from "../components/atoms/Typography";
-import { CustomButton as Button } from "../components/atoms/CustomButton";
+import Button from "../components/atoms/Button";
 import { AuthLayout } from "../components/AuthLayout";
 import TerminalIcon from "@mui/icons-material/Terminal";
+import TextField from "../components/atoms/TextField";
+// Animation variants (no changes here)
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+  },
+};
 
-const StyledTextField = styled(TextField)({
-  "& .MuiInputBase-root": {
-    backgroundColor: "rgba(0,0,0,0.3)",
-    "&:hover": {
-      backgroundColor: "rgba(0,0,0,0.5)",
-    },
-    "&.Mui-focused": {
-      backgroundColor: "rgba(0,0,0,0.5)",
-      boxShadow: "0 0 15px rgba(51, 153, 255, 0.4)",
-    },
-  },
-  "& label.Mui-focused": {
-    color: "#3399FF",
-  },
-  "& .MuiOutlinedInput-root": {
-    "& fieldset": {
-      borderColor: "rgba(255, 255, 255, 0.2)",
-    },
-    "&:hover fieldset": {
-      borderColor: "#3399FF",
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: "#3399FF",
-    },
-  },
-});
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 },
+};
 
 export const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -44,77 +31,87 @@ export const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     try {
       await login({ email, password });
       navigate("/");
-
-      /* eslint-disable @typescript-eslint/no-explicit-any */
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     } catch (err: any) {
       setError("Failed to login. Please check your credentials.");
       console.error(err);
     }
   };
 
+
   return (
     <AuthLayout>
-      <Box component="form" onSubmit={handleSubmit} className="p-8 space-y-6">
-        <Box className="text-center mb-6">
-          <TerminalIcon sx={{ fontSize: 40, color: 'primary' }} />
-          <Typography component="h1" variant="h4" className="!font-bold mt-2">
-            Sourcely
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="p-4 sm:p-8 flex flex-col gap-y-6"
+      >
+        <motion.div variants={itemVariants} className="text-center">
+          <TerminalIcon sx={{ fontSize: 40, color: "var(--color-primary)" }} />
+          <Typography code className="!text-3xl !font-bold mt-2 text-text-primary">
+            Welcome Back
           </Typography>
-          <Typography >
-            Sign in to continue
+          <Typography className="text-text-secondary">
+            Sign in to access your analyses
           </Typography>
+        </motion.div>
+
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-y-4"
+        >
+          <motion.div variants={itemVariants}>
+            <TextField
+              required
+              fullWidth
+              label="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </motion.div>
+
+          <motion.div variants={itemVariants}>
+            <TextField
+              required
+              fullWidth
+              label="Password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </motion.div>
+
+          {error && (
+            <Typography color="error" className="text-center text-sm">
+              {error}
+            </Typography>
+          )}
+
+          <motion.div variants={itemVariants}>
+            <Button type="submit" fullWidth size="large">
+              Sign In
+            </Button>
+          </motion.div>
         </Box>
 
-        <StyledTextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          label="Email Address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <StyledTextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          label="Password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        
-        {error && <Typography color="error" className="text-center">{error}</Typography>}
-
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          sx={{
-            py: 1.5,
-            fontWeight: 600,
-            transition: 'all 0.3s ease',
-            boxShadow: '0 0 10px rgba(51, 153, 255, 0.5)',
-            '&:hover': {
-              boxShadow: '0 0 25px rgba(51, 153, 255, 0.8)',
-              transform: 'translateY(-2px)',
-            },
-          }}
-        >
-          Sign In
-        </Button>
-        <Typography className="text-center text-gray-400 pt-4">
-          Don't have an account?{' '}
-          <Link to="/register" className="font-semibold text-[#3399FF] hover:underline">
-            Register
-          </Link>
-        </Typography>
-      </Box>
+        <motion.div variants={itemVariants}>
+          <Typography className="text-center text-text-secondary pt-4">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="font-semibold text-primary hover:underline transition-colors"
+            >
+              Register
+            </Link>
+          </Typography>
+        </motion.div>
+      </motion.div>
     </AuthLayout>
   );
 };

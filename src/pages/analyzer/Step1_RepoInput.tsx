@@ -1,14 +1,31 @@
 import { useState } from "react";
-import { TextField } from "@mui/material";
+import { motion } from "framer-motion";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import { CustomButton } from "../../components/atoms/CustomButton";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle"; // Using an icon for the checklist
+import Button from "../../components/atoms/Button";
 import Typography from "../../components/atoms/Typography";
+import TextField from "../../components/atoms/TextField";
 
 type Props = {
   onUrlSubmit: (url: string) => void;
 };
 
-const GITHUB_URL_REGEX = /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9-]+\/[a-zA-Z0-9-._]+$/;
+const GITHUB_URL_REGEX =
+  /^(https?:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9-]+\/[a-zA-Z0-9-._]+$/;
+
+// Animation variants for a staggered effect
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0 },
+};
 
 export const Step1_RepoInput = ({ onUrlSubmit }: Props) => {
   const [url, setUrl] = useState("");
@@ -31,38 +48,69 @@ export const Step1_RepoInput = ({ onUrlSubmit }: Props) => {
   };
 
   return (
-    <div className="text-center w-full max-w-2xl">
-      <Typography className="text-4xl sm:text-5xl font-medium">Sourcely</Typography>
-      <Typography className="text-base sm:text-lg text-gray-400 mt-2 mb-8 font-sans">
-        Get an instant AI-powered summary of any public GitHub repository.
-      </Typography>
-      <form
+    <motion.div
+      className="text-center w-full max-w-2xl flex flex-col items-center gap-y-4 md:gap-y-8"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {/* 1. NEW: Action-oriented title */}
+      <motion.div variants={itemVariants}>
+        <Typography
+          code
+          className="text-3xl sm:text-4xl font-bold text-text-primary"
+        >
+          Analyze a Repository
+        </Typography>
+      </motion.div>
+
+      {/* 2. NEW: Value proposition checklist */}
+      <motion.ul className="space-y-2 text-left" variants={itemVariants}>
+        {[
+          "AI-Powered Summaries",
+          "Detailed Setup Instructions",
+          "Full Architecture Overview",
+        ].map((item) => (
+          <li key={item} className="flex items-center gap-x-3">
+            <CheckCircleIcon className="text-secondary" />
+            <Typography className="text-text-secondary ">{item}</Typography>
+          </li>
+        ))}
+      </motion.ul>
+
+      {/* 3. UPDATED: Form with themed TextField */}
+      <motion.form
         onSubmit={handleSubmit}
-        className="flex flex-col items-center gap-4"
+        className="flex flex-col items-center gap-4 w-full"
+        variants={itemVariants}
       >
         <TextField
           label="Enter a Public GitHub Repository URL"
-          variant="outlined"
           fullWidth
           value={url}
           error={!!error}
           helperText={error || " "}
           onChange={(e) => handleChange(e.target.value)}
-          InputProps={{
-            startAdornment: (
-              <GitHubIcon sx={{ mr: 1, color: "text.secondary" }} />
-            ),
+
+          slotProps={{
+            input: {
+              startAdornment: (
+                <GitHubIcon
+                  sx={{ mr: 1, color: "var(--color-text-secondary)" }}
+                />
+              ),
+            },
           }}
         />
-        <CustomButton
+        <Button
           type="submit"
-          size="large"
+          // size="large"
           disabled={!url}
-          className="w-full sm:w-48 !h-12 !font-semibold"
+          className="w-full sm:w-48 !h-12"
         >
-          Next
-        </CustomButton>
-      </form>
-    </div>
+          Analyze
+        </Button>
+      </motion.form>
+    </motion.div>
   );
 };

@@ -11,7 +11,7 @@ import {
   Divider,
 } from "@mui/material";
 import Typography from "../components/atoms/Typography";
-import { CustomButton as Button } from "../components/atoms/CustomButton";
+import Button from "../components/atoms/Button";
 
 export default function ThemeTest() {
   return (

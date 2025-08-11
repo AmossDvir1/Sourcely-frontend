@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { CircularProgress, Alert } from "@mui/material";
+import { Alert } from "@mui/material";
 import Typography from "../../components/atoms/Typography";
-import { CustomButton as Button } from "../../components/atoms/CustomButton";
+import Button from "../../components/atoms/Button";
 import * as analysisService from "../../api/analysisService";
 import type { AiModel } from "../../api/analysisService";
 import { BasicSettings } from "./settings/BasicSettings";
 import { AdvancedSettings } from "./settings/AdvancedSettings";
+import GlowingSpinner from "../../components/atoms/GlowingSpinner";
 
 const DEFAULT_MODEL_ID = "models/gemini-2.0-flash-lite";
 
@@ -94,6 +95,9 @@ export const Step2_AiSettings: React.FC<AiSettingsProps> = ({
   }, [models, setSelectedModel]);
 
   const handleExtensionChange = (_: React.MouseEvent<HTMLElement>, newSelection: string[]) => {
+    if (availableExtensions.length === 1){
+      return;
+    }
     if (newSelection.includes("All") && !includedExtensions.includes("All")) {
       setIncludedExtensions(["All", ...availableExtensions]);
       return;
@@ -151,7 +155,7 @@ export const Step2_AiSettings: React.FC<AiSettingsProps> = ({
   };
 
   // --- RENDER LOGIC ---
-  if (isFetching) return <CircularProgress />;
+  if (isFetching) return <div className="flex items-center justify-center"><GlowingSpinner></GlowingSpinner></div>;
   if (error) return <Alert severity="error">{error}</Alert>;
 
   return (

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { CustomButton as Button } from "./atoms/CustomButton";
+import Button from "./atoms/Button";
 
 export default function UserSettings() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -33,6 +33,7 @@ export default function UserSettings() {
         id="account-menu"
         anchorEl={anchorEl}
         open={open}
+        disableScrollLock
         onClose={handleClose}
         onClick={handleClose} // Closes menu on item click
         slotProps={{
@@ -42,7 +43,7 @@ export default function UserSettings() {
             className:
               "flex flex-col items-center justify-center rounded-xl overflow-visible " +
               "outline outline-1 outline-[var(--color-secondary)] " +
-              "bg-[var(--color-bg-glass)]/25 backdrop-blur-sm " +
+              "bg-[var(--color-bg-glass)]/10 backdrop-blur-xs " +
               "border border-[var(--color-border-glass)] shadow-[0_4px_15px_rgba(0,0,0,0.15)] " +
               "p-5 sm:p-6 md:p-8", // Responsive padding
             sx: {

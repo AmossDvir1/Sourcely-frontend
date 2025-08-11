@@ -1,6 +1,6 @@
 import  { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { CustomButton as Button } from '../../components/atoms/CustomButton';
+import Button from '../../components/atoms/Button';
 import RepoCard from '../../components/RepoCard';
 import Typography from '../../components/atoms/Typography';
 import { useNavigate } from 'react-router-dom';

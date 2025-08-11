@@ -3,7 +3,7 @@ import { useNavigate, Outlet } from "react-router-dom";
 import { ThemeToggleButton } from "./ThemeToggleButton";
 import { motion } from "framer-motion";
 import { useAuth } from "../hooks/useAuth";
-import { CustomButton as Button } from "./atoms/CustomButton";
+import Button from "./atoms/Button";
 import LogoutButton from "./LogoutButton";
 import Typography from "./atoms/Typography";
 import UserSettings from "./UserSettings";
@@ -18,42 +18,42 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <>
+      {/* 1. THEME-AWARE GRID BACKGROUND */}
       <div
         className="
-          fixed inset-0 -z-10 pointer-events-none opacity-25
-          bg-[linear-gradient(to_right,rgba(66,153,225,0.05)_1px,transparent_1px),
-             linear-gradient(to_bottom,rgba(66,153,225,0.05)_1px,transparent_1px)]
+          fixed inset-0 -z-10 pointer-events-none opacity-50
+          bg-[linear-gradient(to_right,var(--color-grid-lines)_1px,transparent_1px),
+             linear-gradient(to_bottom,var(--color-grid-lines)_1px,transparent_1px)]
           bg-[length:40px_40px]
           animate-pan-grid
         "
       />
+      {/* 2. THEME-AWARE MAIN CONTAINER */}
       <div
         className="
           flex flex-col min-h-screen
-          bg-gradient-to-br from-blue-50 to-white
-          dark:from-gray-900 dark:to-gray-800
-          text-gray-900 dark:text-gray-100
-          transition-colors duration-500
+          bg-bg-default text-text-primary
+          transition-colors duration-300
         "
       >
-        {/* Header */}
-        <header className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg sticky top-0 z-10">
+        {/* 3. THEME-AWARE HEADER (Glassmorphism with border) */}
+        <header className="w-full bg-bg-paper/50 dark:bg-bg-paper/50 backdrop-blur-[6px] border-b border-border sticky top-0 z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-            <motion.label
+            <motion.div // Using div for better layout control
               onClick={() => navigate("/")}
+              className="cursor-pointer"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
               <Typography
                 code
-                className="text-xl md:text-2xl font-extrabold cursor-pointer
-                hover:text-primary
-                transition"
+                className="text-xl md:text-2xl font-extrabold
+                text-text-primary hover:text-primary transition"
               >
                 Sourcely
               </Typography>
-            </motion.label>
+            </motion.div>
             <nav className="flex items-center space-x-2 sm:space-x-4">
               {isAuthenticated ? (
                 <>
@@ -62,18 +62,13 @@ export default function Layout({ children }: LayoutProps) {
                 </>
               ) : (
                 <>
-                  <Button
-                    onClick={() => navigate("/login")}
-                    className="px-5 py-2 rounded-lg  transition-shadow shadow-sm hover:shadow-md"
-                    size="small"
-                  >
+                  {/* 4. CLEANED UP BUTTONS */}
+                  <Button onClick={() => navigate("/login")} size="small">
                     Sign In
                   </Button>
                   <Button
-                    typographyProps={{ className: "" }}
                     onClick={() => navigate("/register")}
                     theme="secondary"
-                    size="small"
                   >
                     Sign Up
                   </Button>
@@ -86,16 +81,18 @@ export default function Layout({ children }: LayoutProps) {
 
         {/* Main Content */}
         <main className="flex-grow w-full flex flex-col items-center justify-center px-2 sm:px-6 py-8 sm:py-12">
-          <div className="w-full max-w-4xl bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-0 sm:p-8">
+          {/* 5. THEME-AWARE CONTENT CARD (Crisp outline instead of shadow) */}
+          <div className="w-full max-w-4xl bg-bg-paper ring-1 ring-border rounded-2xl p-4 sm:p-8">
             {children || <Outlet />}
           </div>
         </main>
 
-        {/* Footer */}
-        <footer className="w-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm py-6 px-4 sm:px-6">
-          <div className="max-w-7xl mx-auto text-center text-sm text-gray-600 dark:text-gray-400">
+        {/* 6. THEME-AWARE FOOTER */}
+        <footer className="w-full bg-bg-paper/80 dark:bg-bg-paper/80 backdrop-blur-sm border-t border-border py-6 px-4 sm:px-6">
+          <div className="flex items-center justify-center text-center ">
+            <Typography className="text-sm hover:text-primary w-fit">
             © {new Date().getFullYear()} Sourcely. Built with ❤️ using React,
-            TypeScript, Vite, TailwindCSS, and MUI.
+            TypeScript, Vite, TailwindCSS, and MUI.</Typography>
           </div>
         </footer>
       </div>

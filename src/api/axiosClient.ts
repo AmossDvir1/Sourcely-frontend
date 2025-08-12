@@ -85,8 +85,7 @@ api.interceptors.response.use(
       } catch (refreshError: any) {
         console.error("Token refresh failed. User is unauthenticated. Logging out.", refreshError);
         processQueue(refreshError, null); // Reject all queued requests
-        storage.removeItem(AUTH_TOKEN_KEY);
-        window.location.href = '/login'; // Force a redirect
+        window.dispatchEvent(new Event('auth-failure'));
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

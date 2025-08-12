@@ -89,8 +89,7 @@ const HomePage: React.FC = () => {
 
       {/* 3. ANALYZER: Wrapped in our new cyberpunk glass container and animated */}
       <motion.div
-        className="w-full max-w-2xl mt-4 p-4 rounded-xl
-                   "
+        className="w-full max-w-2xl mt-4 p-4 rounded-xl"
         variants={FADE_IN_VARIANTS}
         initial="hidden"
         animate="visible"

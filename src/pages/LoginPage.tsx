@@ -8,7 +8,7 @@ import Button from "../components/atoms/Button";
 import { AuthLayout } from "../components/AuthLayout";
 import TerminalIcon from "@mui/icons-material/Terminal";
 import TextField from "../components/atoms/TextField";
-// Animation variants (no changes here)
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {

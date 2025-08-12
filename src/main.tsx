@@ -16,12 +16,12 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <GlobalStyles styles="@layer theme, base, mui, components, utilities;" />
 
       <BrowserRouter>
-        <AuthProvider>
           <CustomThemeProvider>
+        <AuthProvider>
             <CssBaseline />
             <App />
-          </CustomThemeProvider>
         </AuthProvider>
+          </CustomThemeProvider>
       </BrowserRouter>
     </StyledEngineProvider>
   </React.StrictMode>

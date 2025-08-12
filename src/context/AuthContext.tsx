@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { login as apiLogin } from "../api/authService";
-import { AuthContext, type User, type AuthContextType } from "../hooks/useAuth"; 
+import { AuthContext, type User, type AuthContextType } from "../hooks/useAuth";
 import api from "../api/axiosClient";
-import { useLocalStorage } from '../hooks/useLocalStorage'; 
-import { AUTH_TOKEN_KEY } from "../constants"; 
+import { useLocalStorage } from "../hooks/useLocalStorage";
+import { AUTH_TOKEN_KEY } from "../constants";
 import PageLoader from "../pages/PageLoader";
 import { AnimatePresence } from "framer-motion";
 
@@ -11,16 +11,23 @@ type LoginCredentials = { email: string; password: string };
 type AuthState = "checking" | "authenticated" | "unauthenticated";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [token, setToken] = useLocalStorage<string | null>(AUTH_TOKEN_KEY, null);
+  const [token, setToken] = useLocalStorage<string | null>(
+    AUTH_TOKEN_KEY,
+    null
+  );
   // This initial state is crucial for showing the loader on the very first render.
   const [authState, setAuthState] = useState<AuthState>("checking");
   const [user, setUser] = useState<User | null>(null);
 
   const logout = useCallback(async () => {
+    // This is for explicit logouts (e.g., button click)
     try {
-      await api.post('/auth/logout');
+      await api.post("/auth/logout");
     } catch (error) {
-      console.error("Server logout call failed, proceeding with client-side cleanup:", error);
+      console.error(
+        "Server logout call failed, proceeding with client cleanup:",
+        error
+      );
     } finally {
       setToken(null);
       setUser(null);
@@ -28,57 +35,68 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [setToken]);
 
-  // This useEffect now handles all initial verification scenarios consistently.
+  // Global listener for session expiration DURING active use.
   useEffect(() => {
-    const verifyUser = async () => {
-      // Create the minimum delay promise. This will now apply to all scenarios.
-      const minDelay = new Promise(resolve => setTimeout(resolve, 2500));
+    const handleAuthFailure = () => {
+      console.log("Global auth-failure event received. Logging out.");
+      logout();
+    };
+    window.addEventListener("auth-failure", handleAuthFailure);
+    return () => window.removeEventListener("auth-failure", handleAuthFailure);
+  }, [logout]);
 
+  // Verification Effect: Self-contained and robust.
+  useEffect(() => {
+    let isCancelled = false;
+
+    const verifyUser = async () => {
+      const minDelay = new Promise((resolve) => setTimeout(resolve, 1200));
+
+      // If there's no token, we are unauthenticated. No API call needed.
       if (!token) {
-        // SCENARIO 1: A new user or a logged-out user.
-        // There's no token, so no API call is needed.
-        // We just wait for the minimum delay to ensure the loader shows.
         await minDelay;
+
         setAuthState("unauthenticated");
-        setUser(null);
-        return; // End execution here.
+        return;
       }
 
-      // SCENARIO 2 & 3: A token exists, so we must verify it.
+      // A token exists, so we enter the checking state.
+      setAuthState("checking");
+
       try {
         const apiCall = api.get<{ user: User }>("/auth/verify");
-        // Wait for both the API call AND the minimum delay to complete.
+
         const [response] = await Promise.all([apiCall, minDelay]);
 
-        // SCENARIO 2: Token is VALID.
-        setUser(response.data.user);
-        setAuthState("authenticated");
-      } catch (err) {
-        // SCENARIO 3: Token is INVALID.
-        console.error("Token verification failed:", err);
-        // Ensure we still wait for the delay in case the API failed instantly.
+        // Happy path: token is valid.
+        if (!isCancelled) {
+          setUser(response.data.user);
+          setAuthState("authenticated");
+        }
+      } catch (error) {
+        console.error("[AuthProvider] 5. FAILURE: API call REJECTED..", error);
         await minDelay;
-        setToken(null); // This will trigger a clean re-run of the effect.
+
+        // Failure path: token is invalid. This CATCH block is now the
+        // single source of truth for handling a FAILED VERIFICATION.
+        // console.error(
+        //   "Verification API call failed. AuthProvider is handling the logout."
+        // );
+        if (!isCancelled) {
+          setToken(null);
+          setUser(null);
+          setAuthState("unauthenticated");
+        }
       }
     };
 
     verifyUser();
-    // Re-running only when `token` changes is the correct dependency.
-  }, [token, setToken]);
 
-
-  // This listener for active session failures remains the same. It's for
-  // when a token expires while the user is actively using the app.
-  useEffect(() => {
-    const handleAuthFailure = () => {
-      logout();
-    };
-    window.addEventListener('auth-failure', handleAuthFailure);
+    // The essential cleanup for StrictMode and preventing race conditions.
     return () => {
-      window.removeEventListener('auth-failure', handleAuthFailure);
+      isCancelled = true;
     };
-  }, [logout]);
-
+  }, [token, setToken]); // Re-run only when the token changes.
 
   const login = async (credentials: LoginCredentials) => {
     const { data } = await apiLogin(credentials);
@@ -87,10 +105,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setAuthState("authenticated");
   };
 
-
-
   const value: AuthContextType = {
-    isAuthenticated: authState === 'authenticated',
+    isAuthenticated: authState === "authenticated",
     user,
     login,
     logout,

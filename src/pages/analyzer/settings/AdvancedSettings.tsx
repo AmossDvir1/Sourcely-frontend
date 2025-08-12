@@ -11,7 +11,7 @@ import Button from "../../../components/atoms/Button";
 import type { AiModel } from "../../../api/analysisService";
 import ModelSelection from "./ModelSelection";
 import { useResponsive } from "../../../hooks/useResponsive";
-import { TitledToggleButtonGroup } from "../../../components/TitledToggleButtonGroup";
+import { TitledChipGroup } from "../../../components/TitledChipGroup";
 
 type AdvancedSettingsProps = {
   models: AiModel[];
@@ -31,15 +31,24 @@ export const AdvancedSettings = (props: AdvancedSettingsProps) => {
 
   return (
     <Accordion>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+      <AccordionSummary
+        className="bg-bg-paper-light"
+        expandIcon={<ExpandMoreIcon />}
+      >
         <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between w-full px-2">
-          <Typography variant="h6">Advanced Settings</Typography>
+          <Typography variant="h6" className="text-base font-medium md:text-xl">
+            Advanced Settings
+          </Typography>
           <Button size="small" disabled theme="secondary">
-            {props.models.find(model => model.id === props?.selectedModel)?.name}
+            {
+              props.models.find((model) => model.id === props?.selectedModel)
+                ?.name
+            }
           </Button>
         </div>
       </AccordionSummary>
-      <AccordionDetails className="space-y-4 sm:space-y-6">
+      <Divider></Divider>
+      <AccordionDetails className="bg-bg-paper-light space-y-4 sm:space-y-6">
         <ModelSelection
           models={props.models}
           selectedModel={props.selectedModel}
@@ -48,7 +57,7 @@ export const AdvancedSettings = (props: AdvancedSettingsProps) => {
         />
         <Divider />
         {/* FileMasking is replaced with our new, clean component */}
-        <TitledToggleButtonGroup
+        <TitledChipGroup
           title="File Masking (Filter by Extension)"
           ariaLabel="file type extensions"
           options={props.availableExtensions}

@@ -64,7 +64,7 @@ const HomePage: React.FC = () => {
       >
         <Typography
           code
-          className="text-3xl text-center md:text-5xl font-medium leading-tight
+          className="text-xl text-center md:text-5xl font-medium leading-tight
                      text-text-primary"
         >
           AI-powered GitHub Repository Insights
@@ -82,14 +82,14 @@ const HomePage: React.FC = () => {
         <AnimatedTypography
           textSequence={animatedTextSequence}
           code
-          className="text-base md:text-lg text-text-secondary text-center min-h-[50px] sm:min-h-[120px] mt-4 whitespace-pre-wrap"
+          className="text-sm md:text-lg text-text-secondary text-center min-h-[50px] sm:min-h-[120px] mt-4 whitespace-pre-wrap"
           repeat={isMobile ? Infinity : 0}
         />
       </motion.div>
 
       {/* 3. ANALYZER: Wrapped in our new cyberpunk glass container and animated */}
       <motion.div
-        className="w-full max-w-2xl mt-4 p-4 rounded-xl"
+        className="w-full max-w-2xl mt-4 py-4 px-0 rounded-xl"
         variants={FADE_IN_VARIANTS}
         initial="hidden"
         animate="visible"

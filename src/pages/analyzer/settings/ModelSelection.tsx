@@ -17,9 +17,8 @@ const ModelSelection = ({
   models,
   selectedModel,
   onSelect,
-  height
+  height,
 }: ModelSelectionProps) => {
-
   const renderModelRow = ({
     item,
     style,
@@ -36,6 +35,7 @@ const ModelSelection = ({
     <ListItem
       key={item.id}
       style={style}
+      className="outline-1  outline-[rgba(var(--color-primary-rgb),0.3)]"
       component="div" // Render as a div instead of li for structure
       disablePadding // We disable padding because ListItemButton has its own
     >
@@ -46,39 +46,45 @@ const ModelSelection = ({
         selected={isSelected} // Use the `selected` prop for state
         className={clsx(
           "flex justify-between items-center w-full h-full",
-          "transition-colors duration-200",
+          "transition-colors duration-200 dark:bg-bg-default/30 bg-bg-default/80",
           !isSelected ? "hover:bg-[rgba(var(--color-primary-rgb),0.05)]" : ""
         )}
         // ✅ 3. (Optional but Recommended) USE SX FOR MUI-SPECIFIC STATES
         // This is the cleanest way to style the `selected` state.
         sx={{
           "&.Mui-selected": {
-            backgroundColor: "rgba(var(--color-primary-rgb), 0.1)",
+            backgroundColor: "rgba(var(--color-primary-rgb),0.1)",
             "&:hover": {
-              backgroundColor: "rgba(var(--color-primary-rgb), 0.15)",
+              backgroundColor: "rgba(var(--color-primary-rgb),0.15)",
             },
           },
         }}
       >
         <ListItemText
           primary={
-            <Typography className="!font-semibold">{item.name}</Typography>
+            <Typography className="!font-semibold text-sm md:text-base">
+              {item.name}
+            </Typography>
           }
           secondary={
-            <Typography variant="caption">{item.description}</Typography>
+            <Typography variant="caption" className="text-xs">
+              {item.description}
+            </Typography>
           }
         />
-        {isSelected && <CheckCircleIcon className="text-primary" sx={{ ml: 2 }} />}
+        {isSelected && (
+          <CheckCircleIcon className="text-primary" sx={{ ml: 2 }} />
+        )}
       </ListItemButton>
     </ListItem>
   );
 
   return (
     <div>
-      <Typography gutterBottom>Model Selection</Typography>
+      <Typography className="text-sm md:text-lg" gutterBottom>Model Selection</Typography>
       <VirtualTable
         items={models}
-        rowHeight={120} // We've decided each row will be 70px tall
+        rowHeight={140} // We've decided each row will be 70px tall
         height={height} // The scrollable container will be 350px tall
         selectedId={selectedModel}
         onRowClick={(item) => onSelect(item.id)}
@@ -89,4 +95,3 @@ const ModelSelection = ({
 };
 
 export default ModelSelection;
-

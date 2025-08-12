@@ -2,9 +2,10 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
+  Divider,
 } from "@mui/material";
 import Typography from "../../../components/atoms/Typography";
-import { TitledToggleButtonGroup } from "../../../components/TitledToggleButtonGroup";
+import { TitledChipGroup } from "../../../components/TitledChipGroup";
 
 type BasicSettingsProps = {
   selectedTypes: string[];
@@ -18,16 +19,22 @@ type BasicSettingsProps = {
 export const BasicSettings = ({
   selectedTypes,
   onChange,
-  contentTypes
+  contentTypes,
 }: BasicSettingsProps) => {
   return (
     <Accordion defaultExpanded>
-      <AccordionSummary sx={{ pointerEvents: 'none' }}>
-        <Typography variant="h6">Basic Settings</Typography>
+      <AccordionSummary
+        className="bg-bg-paper-light min-h-0"
+        sx={{ pointerEvents: "none", margin: 0 }}
+      >
+        <Typography className="text-base font-medium md:text-xl">
+          Basic Settings
+        </Typography>
       </AccordionSummary>
-      <AccordionDetails>
+      <Divider></Divider>
+      <AccordionDetails className="bg-bg-paper-light">
         {/* The old ToggleButtonGroup is replaced with our new, clean component */}
-        <TitledToggleButtonGroup
+        <TitledChipGroup
           title="Generated Content"
           ariaLabel="generated content type"
           options={contentTypes}

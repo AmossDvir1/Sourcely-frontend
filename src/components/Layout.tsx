@@ -82,7 +82,7 @@ export default function Layout({ children }: LayoutProps) {
         {/* Main Content */}
         <main className="flex-grow w-full flex flex-col items-center justify-center px-2 sm:px-6 py-8 sm:py-12">
           {/* 5. THEME-AWARE CONTENT CARD (Crisp outline instead of shadow) */}
-          <div className="w-full max-w-4xl bg-bg-paper ring-1 ring-border rounded-2xl p-4 sm:p-8">
+          <div className="w-full max-w-4xl bg-bg-paper ring-1 ring-border rounded-2xl py-4 px-0 md:px-4 md:py-8">
             {children || <Outlet />}
           </div>
         </main>

@@ -172,7 +172,7 @@ const Analyzer: React.FC = () => {
   };
 
   return (
-    <main className="min-h-full w-full flex flex-col items-center justify-center p-2 sm:p-4">
+    <main className="min-h-full w-full flex flex-col items-center justify-center p-2 md:py-4 px-0 md:px-4 ">
       <div className="w-full max-w-3xl flex flex-col items-center justify-center backdrop-blur-sm border border-white/10 rounded-xl p-4 sm:p-8 shadow-lg min-h-[380px] sm:min-h-[400px]">
         <AnimatePresence mode="wait">{renderContent()}</AnimatePresence>
       </div>

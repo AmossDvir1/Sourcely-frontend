@@ -161,7 +161,7 @@ export const Step2_AiSettings: React.FC<AiSettingsProps> = ({
   return (
     <div className="w-full max-w-3xl animate-fade-in space-y-4">
       <div className="text-center mb-6 sm:mb-8">
-        <Typography variant="h4" component="h2" className="!font-bold !text-2xl sm:!text-3xl lg:!text-4xl">
+        <Typography variant="h4" component="h2" className="font-medium !text-2xl sm:!text-3xl lg:!text-4xl">
           AI Analysis Settings
         </Typography>
         <Typography

@@ -89,6 +89,7 @@ html {
   /* Background & Surface (Cool, off-white neutrals) */
   --color-bg-default: #f8fafc; /* Page background (a very light slate) */
   --color-bg-paper: #ffffff; /* Card/modal background */
+  --color-bg-paper-light: #f4f8fb;
   --color-bg-hover: #f1f5f9; /* Subtle hover for list items */
 
   /* Text */
@@ -146,6 +147,7 @@ html {
   /* Background & Surface (Deep, cool neutrals) */
   --color-bg-default: #020617; /* A deep, dark navy-slate background */
   --color-bg-paper: #0f172a; /* Cards and surfaces (one step lighter) */
+  --color-bg-paper-light: #171e2e; /* Cards and surfaces (one step lighter) */
   --color-bg-hover: #1e293b; /* Hover for list items */
 
   /* Text */

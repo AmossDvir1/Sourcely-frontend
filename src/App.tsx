@@ -10,6 +10,7 @@ import SettingsPage from "./pages/settings/SettingsPage";
 import AnalysesSettings from "./pages/settings/AnalysesSettings";
 import ProfileSettings from "./pages/settings/ProfileSettings";
 import AnalysisDisplayTest from "./pages/AnalysisDisplayTest";
+import AnalysisViewerPage from "./pages/analyzer/AnalysisViewerPage";
 
 function App() {
   return (
@@ -20,7 +21,10 @@ function App() {
 
         <Route path="/theme" element={<ThemeTest />} />
         <Route path="/testanalysis" element={<AnalysisDisplayTest />} />
-
+        <Route
+          path="/analysis/view/:analysisId"
+          element={<AnalysisViewerPage />}
+        />
         <Route path="/register" element={<RegisterPage />} />
         <Route element={<PrivateRoute />}>
           <Route path="/settings" element={<SettingsPage />}>

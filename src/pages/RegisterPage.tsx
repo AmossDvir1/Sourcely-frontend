@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Box } from "@mui/material";
 import { motion } from "framer-motion";
 import { AuthLayout } from "../components/AuthLayout";
@@ -34,17 +34,23 @@ export const RegisterPage = () => {
   const [error, setError] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    // Find the redirect path from the URL query
+    const queryParams = new URLSearchParams(location.search);
+    const redirectPath = queryParams.get("redirect");
     try {
       await apiRegister({ username, email, password });
       await login({ email, password });
-      navigate("/");
-    /* eslint-disable @typescript-eslint/no-explicit-any */
+      navigate(redirectPath || "/");
+      /* eslint-disable @typescript-eslint/no-explicit-any */
     } catch (err: any) {
-      setError("Registration failed. Please try a different email or username.");
+      setError(
+        "Registration failed. Please try a different email or username."
+      );
       console.error(err);
     }
   };
@@ -61,7 +67,10 @@ export const RegisterPage = () => {
         {/* 1. THEMED HEADER */}
         <motion.div variants={itemVariants} className="text-center">
           <TerminalIcon sx={{ fontSize: 40, color: "var(--color-primary)" }} />
-          <Typography code className="!text-3xl !font-bold mt-2 text-text-primary">
+          <Typography
+            code
+            className="!text-3xl !font-bold mt-2 text-text-primary"
+          >
             Create Account
           </Typography>
           <Typography className="text-text-secondary">
@@ -77,13 +86,15 @@ export const RegisterPage = () => {
         >
           <motion.div variants={itemVariants}>
             <TextField
-            autoComplete={"off"}
-            slotProps={{input:{autoComplete: "off"}}}
+              autoComplete={"off"}
+              slotProps={{ input: { autoComplete: "off" } }}
               required
               fullWidth
               label="Username"
               value={username}
-              onChange={(e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setUsername(e.target.value)}
+              onChange={(
+                e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+              ) => setUsername(e.target.value)}
             />
           </motion.div>
 
@@ -92,11 +103,12 @@ export const RegisterPage = () => {
               required
               fullWidth
               label="Email Address"
-                          slotProps={{input:{autoComplete: "off"}}}
-
+              slotProps={{ input: { autoComplete: "off" } }}
               type="email"
               value={email}
-              onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setEmail(e.target.value)}
+              onChange={(
+                e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+              ) => setEmail(e.target.value)}
             />
           </motion.div>
 
@@ -106,10 +118,11 @@ export const RegisterPage = () => {
               fullWidth
               label="Password"
               type="password"
-                          slotProps={{input:{autoComplete: "new-password"}}}
-
+              slotProps={{ input: { autoComplete: "new-password" } }}
               value={password}
-              onChange={(e:React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setPassword(e.target.value)}
+              onChange={(
+                e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+              ) => setPassword(e.target.value)}
             />
           </motion.div>
 

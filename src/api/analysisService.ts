@@ -10,24 +10,30 @@ export interface AiModel {
   description: string;
 }
 
-// From: schemas/analysis.py -> AnalysisResponse
-export interface AnalysisResponse {
-  analysis: string;
-  sourceCode: string;
+// From: schemas/analysis.py -> StagedAnalysisResponse
+export interface StagedAnalysisResponse {
+  tempId: string;
 }
 
 // From: schemas/analysis.py -> AnalysisOut
 export interface SavedAnalysis {
-  id: string;
+  _id: string;
   user_id: string;
   name: string;
   description?: string;
   repository: string;
   modelUsed: string;
-  analysis_content: string;
+  analysisContent: string;
   sourceCode: string;
   analysisDate: string; // ISO string date
 }
+
+/**
+ * Fetches a single analysis (staged or saved) by its ID.
+ */
+export const getAnalysisById = (analysisId: string) => {
+  return api.get<SavedAnalysis>(`/code/analyses/${analysisId}`);
+};
 
 /**
  * Fetches the list of file extensions from a repository for masking.
@@ -45,25 +51,22 @@ export const getModels = () => {
 };
 
 /**
- * Submits a repository URL and model ID to get an AI analysis.
+ * Submits for analysis and gets back a tempId.
  */
 export const analyzeRepo = (
   githubUrl: string, 
   modelId: string, 
   settings: { contentType: string[]; includedExtensions: string[] | null }
 ) => {
-  // The backend will eventually use contentType, but for now we send the file mask
-  return api.post<AnalysisResponse>("/code/analyze", { 
+  return api.post<StagedAnalysisResponse>("/code/analyze", { 
     githubUrl, 
     modelId, 
     includedExtensions: settings.includedExtensions ,
     contentTypes: settings.contentType,
   });
 };
-
 /**
- * Saves a completed analysis to the user's account.
- * The backend gets the user ID from the auth token.
+ * Saves an analysis. Can now include a tempId to "claim" a staged analysis.
  */
 export const saveAnalysis = (data: AnalysisSaveData) => {
     const payload = {
@@ -72,7 +75,8 @@ export const saveAnalysis = (data: AnalysisSaveData) => {
         repository: data.repository,
         modelUsed: data.model,
         analysisContent: data.analysisContent,
-        sourceCode: "placeholder", // The Analyzer component will need to provide this.
+        sourceCode: "placeholder", // This still needs to be handled
+        tempId: data.analysisId // Pass the ID to claim the analysis
     };
   return api.post<SavedAnalysis>('/code/analyses', payload);
 };

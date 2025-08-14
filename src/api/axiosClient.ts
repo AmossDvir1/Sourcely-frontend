@@ -68,8 +68,13 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // We only care about 401s that haven't been retried yet.
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // We only attempt a refresh if the original request had an auth token AND hasn't been retried.
+    // This prevents the infinite loop for unauthenticated users who get a 401 on a protected route.
+    if (
+      error.response?.status === 401 &&
+      originalRequest.headers.Authorization &&
+      !originalRequest._retry
+    ) {
       // If a refresh is already in progress, queue subsequent failed requests.
       if (isRefreshing) {
         return new Promise((resolve, reject) => {

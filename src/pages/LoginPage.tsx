@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Box } from "@mui/material";
 import { motion } from "framer-motion";
 import Typography from "../components/atoms/Typography";
@@ -28,20 +28,24 @@ export const LoginPage = () => {
   const [error, setError] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    // Find the redirect path from the URL query
+    const queryParams = new URLSearchParams(location.search);
+    const redirectPath = queryParams.get("redirect");
     try {
       await login({ email, password });
-      navigate("/");
-    /* eslint-disable @typescript-eslint/no-explicit-any */
+      navigate(redirectPath || "/");
+      /* eslint-disable @typescript-eslint/no-explicit-any */
     } catch (err: any) {
       setError("Failed to login. Please check your credentials.");
       console.error(err);
     }
   };
-
 
   return (
     <AuthLayout>
@@ -53,7 +57,10 @@ export const LoginPage = () => {
       >
         <motion.div variants={itemVariants} className="text-center">
           <TerminalIcon sx={{ fontSize: 40, color: "var(--color-primary)" }} />
-          <Typography code className="!text-3xl !font-bold mt-2 text-text-primary">
+          <Typography
+            code
+            className="!text-3xl !font-bold mt-2 text-text-primary"
+          >
             Welcome Back
           </Typography>
           <Typography className="text-text-secondary">

@@ -1,25 +1,24 @@
 import { useState } from "react";
 import { Alert } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 import { Step1_RepoInput } from "./Step1_RepoInput";
-import { AnalysisDisplay } from "./AnalysisDisplay";
 import Button from "../../components/atoms/Button";
-import type { AnalysisSaveData } from "./SaveAnalysisDialog";
 import * as analysisService from "../../api/analysisService";
 import { Step2_AiSettings, type AnalysisSettings } from "./Step2_AiSettings";
 import GlowingSpinner from "../../components/atoms/GlowingSpinner";
-
+import { type StagedAnalysisResponse } from "../../api/analysisService"; 
 type AnalysisStep = "INPUT" | "MODEL_SELECTION" | "RESULT";
 
 const Analyzer: React.FC = () => {
+  const navigate = useNavigate(); // NEW
+
   const [step, setStep] = useState<AnalysisStep>("INPUT");
-  const [sourceCode, setSourceCode] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState<string>("");
   const [repoName, setRepoName] = useState<string>("");
 
   const [url, setUrl] = useState("");
-  const [analysis, setAnalysis] = useState<string | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,62 +28,49 @@ const Analyzer: React.FC = () => {
     setStep("MODEL_SELECTION");
   };
 
-  const handleAnalyze = async (settings: AnalysisSettings) => {
+ const handleAnalyze = async (settings: AnalysisSettings) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await analysisService.analyzeRepo(
+      // STEP 1: Call analyzeRepo ONCE to get the temporary ID.
+      const stageResponse: StagedAnalysisResponse = (await analysisService.analyzeRepo(
         url,
         settings.modelId,
         {
           contentType: settings.contentType,
           includedExtensions: settings.includedExtensions,
         }
-      );
-      setAnalysis(response.data.analysis);
-      setSourceCode(response.data.sourceCode);
-      setStep("RESULT");
+      )).data;
+
+      const tempId = stageResponse.tempId;
+
+      // STEP 2: Use that ID to pre-fetch the full data.
+      const analysisData = (await analysisService.getAnalysisById(tempId)).data;
+
+      // STEP 3: Navigate to the viewer page.
+      // - The 'tempId' goes in the URL.
+      // - The full 'analysisData' is passed in the navigation state object.
+      navigate(`/analysis/view/${tempId}`, { state: { analysis: analysisData } });
+
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
       } else {
         setError("An unexpected error occurred.");
       }
-    } finally {
-      setIsLoading(false);
+      // Make sure the loader stops on an error.
+      setIsLoading(false); 
     }
-  };
-
-  const handleSaveAnalysis = async (data: AnalysisSaveData) => {
-    if (!sourceCode) {
-      throw new Error("Source code is not available to save.");
-    }
-
-    const saveData = {
-      ...data,
-      sourceCode: sourceCode,
-    };
-
-    try {
-      await analysisService.saveAnalysis(saveData);
-    } catch (error) {
-      console.error("API call to save analysis failed:", error);
-      throw error;
-    }
-  };
-
-  const handleReset = () => {
-    setStep("INPUT");
-    setUrl("");
-    setSelectedModel("");
-    setAnalysis(null);
-    setError(null);
   };
 
   const renderContent = () => {
     if (isLoading) {
-      return <div className="flex items-center justify-center"><GlowingSpinner></GlowingSpinner></div>;
+      return (
+        <div className="flex items-center justify-center">
+          <GlowingSpinner />
+        </div>
+      );
     }
     if (error) {
       return (
@@ -109,7 +95,7 @@ const Analyzer: React.FC = () => {
     }
 
     switch (step) {
-      case "INPUT": {
+      case "INPUT":
         return (
           <motion.div
             key="input"
@@ -120,7 +106,6 @@ const Analyzer: React.FC = () => {
             <Step1_RepoInput onUrlSubmit={handleRepoSubmit} />
           </motion.div>
         );
-      }
       case "MODEL_SELECTION":
         return (
           <motion.div
@@ -141,33 +126,8 @@ const Analyzer: React.FC = () => {
             />
           </motion.div>
         );
-
-      case "RESULT": {
-        return (
-          analysis && (
-            <motion.div
-              key="result"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="w-full"
-            >
-              <AnalysisDisplay
-                model={selectedModel}
-                repoName={repoName}
-                repoUrl={url}
-                onSave={handleSaveAnalysis}
-                analysis={analysis}
-                onReset={handleReset}
-              />
-            </motion.div>
-          )
-        );
-      }
-
-      default: {
-        const _exhaustiveCheck: never = step;
-        return <div>Something went wrong: {_exhaustiveCheck}</div>;
-      }
+      default:
+        return null;
     }
   };
 

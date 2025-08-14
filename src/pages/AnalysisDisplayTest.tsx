@@ -1,4 +1,4 @@
-import { AnalysisDisplay } from "./analyzer/AnalysisDisplay";
+import AnalysisDisplay from "./analyzer/AnalysisDisplay";
 import type { AnalysisSaveData } from "./analyzer/SaveAnalysisDialog";
 const content = `
 Code Analysis of Virtual Memory Project

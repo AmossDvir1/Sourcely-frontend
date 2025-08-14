@@ -19,6 +19,7 @@ export interface AnalysisSaveData {
   analysisDate: string;
   model: string;
   analysisContent: string;
+  analysisId?: string; 
 }
 
 type SaveAnalysisDialogProps = {
@@ -28,9 +29,10 @@ type SaveAnalysisDialogProps = {
   repoName: string;
   modelUsed: string; // e.g., "GPT-4",
   analysisContent: string;
+  analysisId?: string; 
 };
 
-export const SaveAnalysisDialog: React.FC<SaveAnalysisDialogProps> = ({ open, onClose, onSave, repoName, modelUsed, analysisContent }) => {
+export const SaveAnalysisDialog: React.FC<SaveAnalysisDialogProps> = ({ open, onClose, onSave, repoName, modelUsed, analysisContent, analysisId  }) => {
   // State for the editable form fields
   const [name, setName] = useState(repoName);
   const [description, setDescription] = useState('');
@@ -46,7 +48,7 @@ export const SaveAnalysisDialog: React.FC<SaveAnalysisDialogProps> = ({ open, on
     }
   }, [open, repoName]);
 
-  const handleSave = async () => {
+const handleSave = async () => {
     setIsSaving(true);
     const analysisDate = new Date().toISOString();
 
@@ -56,7 +58,8 @@ export const SaveAnalysisDialog: React.FC<SaveAnalysisDialogProps> = ({ open, on
       repository: repoName,
       analysisDate,
       model: modelUsed,
-      analysisContent
+      analysisContent,
+      analysisId: analysisId, // NEW: Include the ID in the save data
     };
 
     try {

@@ -1,4 +1,4 @@
-import  { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Button from '../../components/atoms/Button';
 import RepoCard from '../../components/RepoCard';
@@ -79,7 +79,7 @@ const AnalysesSettings = () => {
         <div className="space-y-4">
             {/* Update RepoCard to expect the new data shape */}
             {analyses.map(analysis => (
-                <RepoCard key={analysis.id} analysis={analysis} />
+                <RepoCard key={analysis._id} analysis={analysis} />
             ))}
         </div>
     </motion.div>

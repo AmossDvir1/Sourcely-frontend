@@ -14,30 +14,32 @@ interface Message {
   sender: "user" | "bot";
 }
 
-
-
 const ChatPage = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputValue, setInputValue] = useState('');
-  const [indexingStatus, setIndexingStatus] = useState<IndexingStatus>('preparing');
+  const [inputValue, setInputValue] = useState("");
+  const [indexingStatus, setIndexingStatus] =
+    useState<IndexingStatus>("preparing");
   const webSocketRef = useRef<WebSocket | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null); // Ref for auto-scrolling
 
   const pollingIntervalRef = useRef<number | null>(null);
 
-    // Auto-scroll to the bottom of the messages list when it updates
+  // Auto-scroll to the bottom of the messages list when it updates
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-useEffect(() => {
+  useEffect(() => {
     if (!sessionId) return;
 
     pollingIntervalRef.current = window.setInterval(async () => {
       try {
         const response = await analysisService.getChatStatus(sessionId);
-        if (response.data.status === 'ready' || response.data.status === 'error') {
+        if (
+          response.data.status === "ready" ||
+          response.data.status === "error"
+        ) {
           setIndexingStatus(response.data.status);
           if (pollingIntervalRef.current) {
             clearInterval(pollingIntervalRef.current);
@@ -45,7 +47,7 @@ useEffect(() => {
         }
       } catch (error) {
         console.error("Failed to get chat status", error);
-        setIndexingStatus('error');
+        setIndexingStatus("error");
         if (pollingIntervalRef.current) {
           clearInterval(pollingIntervalRef.current);
         }
@@ -59,36 +61,37 @@ useEffect(() => {
     };
   }, [sessionId]);
 
-
-
   // Effect for establishing WebSocket connection ONCE ready
   useEffect(() => {
-    if (indexingStatus === 'ready' && sessionId && !webSocketRef.current) {
+    if (indexingStatus === "ready" && sessionId && !webSocketRef.current) {
       const wsUrl = `ws://localhost:3001/api/v1/code/ws/chat/${sessionId}`;
       const ws = new WebSocket(wsUrl);
       webSocketRef.current = ws;
 
-      ws.onopen = () => console.log('WebSocket connected');
+      ws.onopen = () => console.log("WebSocket connected");
       ws.onmessage = (event) => {
-      // Append streaming bot response
-      setMessages((prev) => {
-        const lastMessage = prev[prev.length - 1];
-        if (lastMessage && lastMessage.sender === "bot") {
-          // Append to the last message
-          const updatedMessages = [...prev];
-          updatedMessages[updatedMessages.length - 1] = {
-            ...lastMessage,
-            text: lastMessage.text + event.data,
-          };
-          return updatedMessages;
-        } else {
-          // Create a new bot message
-          return [...prev, { id: Date.now(), text: event.data, sender: "bot" }];
-        }
-      });
-    };
-      ws.onclose = () => console.log('WebSocket disconnected');
-      ws.onerror = (error) => console.error('WebSocket error:', error);
+        // Append streaming bot response
+        setMessages((prev) => {
+          const lastMessage = prev[prev.length - 1];
+          if (lastMessage && lastMessage.sender === "bot") {
+            // Append to the last message
+            const updatedMessages = [...prev];
+            updatedMessages[updatedMessages.length - 1] = {
+              ...lastMessage,
+              text: lastMessage.text + event.data,
+            };
+            return updatedMessages;
+          } else {
+            // Create a new bot message
+            return [
+              ...prev,
+              { id: Date.now(), text: event.data, sender: "bot" },
+            ];
+          }
+        });
+      };
+      ws.onclose = () => console.log("WebSocket disconnected");
+      ws.onerror = (error) => console.error("WebSocket error:", error);
     }
 
     // Cleanup WebSocket on component unmount
@@ -113,24 +116,30 @@ useEffect(() => {
     }
   };
 
-
-const renderStatus = () => {
+  const renderStatus = () => {
     switch (indexingStatus) {
-      case 'preparing':
+      case "preparing":
         return (
           <div className="flex flex-col items-center justify-center text-center p-8">
             <GlowingSpinner />
-            <Typography variant="h6" className="mt-4">Preparing Repository...</Typography>
-            <Typography color="text.secondary">This may take a moment for large repositories.</Typography>
+            <Typography variant="h6" className="mt-4">
+              Preparing Repository...
+            </Typography>
+            <Typography color="text.secondary">
+              This may take a moment for large repositories.
+            </Typography>
           </div>
         );
-      case 'error':
-        return <Alert severity="error">Failed to prepare the chat session. Please try again.</Alert>;
-      case 'ready':
+      case "error":
+        return (
+          <Alert severity="error">
+            Failed to prepare the chat session. Please try again.
+          </Alert>
+        );
+      case "ready":
         return null; // Don't show anything, the chat is ready
     }
   };
-
 
   return (
     <div className="flex flex-col h-[85vh] w-full max-w-4xl mx-auto">
@@ -160,7 +169,9 @@ const renderStatus = () => {
                 >
                   <Typography
                     variant="body1"
-                    className={`whitespace-pre-wrap text-sm sm:text-base ${msg.sender === "user" ? "text-on-secondary": ""}`}
+                    className={`whitespace-pre-wrap text-sm sm:text-base ${
+                      msg.sender === "user" ? "text-on-secondary" : ""
+                    }`}
                   >
                     {msg.text}
                   </Typography>
@@ -169,28 +180,28 @@ const renderStatus = () => {
             ))}
         <div ref={messagesEndRef} />
       </Paper>
-      
+
       <div className="p-2 sm:p-4 bg-bg-paper border-t border-border">
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="Ask a question about the code..."
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-          disabled={indexingStatus !== "ready"}
-          // Use InputProps for adornments
-          slotProps={{input: {
-            endAdornment: (
-              <IconButton
-                onClick={handleSendMessage}
-                disabled={indexingStatus !== "ready"}
-              >
-                <SendIcon />
-              </IconButton>
-            ),
-          }}}
-        />
+<TextField
+  fullWidth
+  variant="outlined"
+  placeholder="Ask a question about the code..."
+  value={inputValue}
+  onChange={(e) => setInputValue(e.target.value)}
+  onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+  disabled={indexingStatus !== "ready"}
+  InputProps={{
+    endAdornment: (
+      <IconButton
+        onClick={handleSendMessage}
+        disabled={indexingStatus !== "ready"}
+        edge="end"
+      >
+        <SendIcon />
+      </IconButton>
+    ),
+  }}
+/>
       </div>
     </div>
   );

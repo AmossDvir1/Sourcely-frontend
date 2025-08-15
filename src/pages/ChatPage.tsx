@@ -181,7 +181,7 @@ const ChatPage = () => {
         <div ref={messagesEndRef} />
       </Paper>
 
-      <div className="p-2 sm:p-4 bg-bg-paper border-t border-border">
+      <div className="p-2 sm:p-4 bg-bg-paper border-t border-border flex ">
 <TextField
   fullWidth
   variant="outlined"
@@ -190,18 +190,26 @@ const ChatPage = () => {
   onChange={(e) => setInputValue(e.target.value)}
   onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
   disabled={indexingStatus !== "ready"}
-  InputProps={{
-    endAdornment: (
-      <IconButton
+//   InputProps={{
+//     endAdornment: (
+//       <IconButton
+//         onClick={handleSendMessage}
+//         disabled={indexingStatus !== "ready"}
+//         edge="end"
+//       >
+//         <SendIcon />
+//       </IconButton>
+//     ),
+//   }}
+/>
+<IconButton
+disableRipple
         onClick={handleSendMessage}
-        disabled={indexingStatus !== "ready"}
+        disabled={indexingStatus !== "ready" || inputValue.trim().length === 0}
         edge="end"
       >
         <SendIcon />
       </IconButton>
-    ),
-  }}
-/>
       </div>
     </div>
   );

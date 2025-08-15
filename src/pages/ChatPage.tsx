@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { Paper, TextField, IconButton, Alert } from "@mui/material";
+import { Paper, IconButton, Alert } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import Typography from "../components/atoms/Typography";
 import GlowingSpinner from "../components/atoms/GlowingSpinner";
 import * as analysisService from "../api/analysisService";
+import TextField from "../components/atoms/TextField";
 
 type IndexingStatus = "preparing" | "ready" | "error";
 
@@ -182,34 +183,35 @@ const ChatPage = () => {
       </Paper>
 
       <div className="p-2 sm:p-4 bg-bg-paper border-t border-border flex ">
-<TextField
-  fullWidth
-  variant="outlined"
-  placeholder="Ask a question about the code..."
-  value={inputValue}
-  onChange={(e) => setInputValue(e.target.value)}
-  onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-  disabled={indexingStatus !== "ready"}
-//   InputProps={{
-//     endAdornment: (
-//       <IconButton
-//         onClick={handleSendMessage}
-//         disabled={indexingStatus !== "ready"}
-//         edge="end"
-//       >
-//         <SendIcon />
-//       </IconButton>
-//     ),
-//   }}
-/>
-<IconButton
-disableRipple
-        onClick={handleSendMessage}
-        disabled={indexingStatus !== "ready" || inputValue.trim().length === 0}
-        edge="end"
-      >
-        <SendIcon />
-      </IconButton>
+        <TextField
+          fullWidth
+          placeholder="Ask a question about the code..."
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+          disabled={indexingStatus !== "ready"}
+          //   InputProps={{
+          //     endAdornment: (
+          //       <IconButton
+          //         onClick={handleSendMessage}
+          //         disabled={indexingStatus !== "ready"}
+          //         edge="end"
+          //       >
+          //         <SendIcon />
+          //       </IconButton>
+          //     ),
+          //   }}
+        />
+        <IconButton
+          disableRipple
+          onClick={handleSendMessage}
+          disabled={
+            indexingStatus !== "ready" || inputValue.trim().length === 0
+          }
+          edge="end"
+        >
+          <SendIcon />
+        </IconButton>
       </div>
     </div>
   );

@@ -6,9 +6,10 @@ import Button from "../../components/atoms/Button";
 import Typography from "../../components/atoms/Typography";
 import TextField from "../../components/atoms/TextField";
 import { Divider } from "@mui/material";
-
+import ChatIcon from "@mui/icons-material/Chat";
 type Props = {
   onUrlSubmit: (url: string) => void;
+  onChatSubmit: (url: string) => void;
 };
 
 const GITHUB_URL_REGEX =
@@ -28,14 +29,22 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-export const Step1_RepoInput = ({ onUrlSubmit }: Props) => {
+export const Step1_RepoInput = ({ onUrlSubmit, onChatSubmit }: Props) => {
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleAnalyzeSubmit  = (e: React.FormEvent) => {
     e.preventDefault();
     if (GITHUB_URL_REGEX.test(url)) {
       onUrlSubmit(url);
+    } else {
+      setError("Please enter a valid GitHub repository URL.");
+    }
+  };
+
+  const handleChatSubmit = () => {
+    if (GITHUB_URL_REGEX.test(url)) {
+      onChatSubmit(url);
     } else {
       setError("Please enter a valid GitHub repository URL.");
     }
@@ -66,7 +75,10 @@ export const Step1_RepoInput = ({ onUrlSubmit }: Props) => {
       </motion.div>
 
       {/* 2. NEW: Value proposition checklist */}
-      <motion.ul className="space-y-2 md:space-y-3 text-left " variants={itemVariants}>
+      <motion.ul
+        className="space-y-2 md:space-y-3 text-left "
+        variants={itemVariants}
+      >
         {[
           "AI-Powered Summaries",
           "Detailed Setup Instructions",
@@ -74,14 +86,16 @@ export const Step1_RepoInput = ({ onUrlSubmit }: Props) => {
         ].map((item) => (
           <li key={item} className="flex items-center gap-x-3">
             <CheckCircleIcon className="text-secondary" />
-            <Typography className="text-text-secondary text-sm">{item}</Typography>
+            <Typography className="text-text-secondary text-sm">
+              {item}
+            </Typography>
           </li>
         ))}
       </motion.ul>
-<Divider className="flex w-full mt-0 mb-3"></Divider>
+      <Divider className="flex w-full mt-0 mb-3"></Divider>
       {/* 3. UPDATED: Form with themed TextField */}
       <motion.form
-        onSubmit={handleSubmit}
+        // onSubmit={handleSubmit}
         className="flex flex-col items-center gap-4 w-full"
         variants={itemVariants}
       >
@@ -92,7 +106,6 @@ export const Step1_RepoInput = ({ onUrlSubmit }: Props) => {
           error={!!error}
           helperText={error || " "}
           onChange={(e) => handleChange(e.target.value)}
-
           slotProps={{
             input: {
               startAdornment: (
@@ -107,12 +120,23 @@ export const Step1_RepoInput = ({ onUrlSubmit }: Props) => {
 
         <Button
           type="submit"
+          onClick={handleAnalyzeSubmit}
           // size="large"
           disabled={!url}
           className="w-56 max-w-lg md:w-48 md:h-12 !h-10"
         >
           Analyze
         </Button>
+        <Button
+          onClick={handleChatSubmit}
+          disabled={!url}
+          theme="secondary"
+          startIcon={<ChatIcon />}
+          className="w-56 max-w-lg md:w-48 md:h-12 !h-10"
+        >
+          Chat about Repo
+        </Button>
+
       </motion.form>
     </motion.div>
   );

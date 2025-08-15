@@ -87,3 +87,11 @@ export const saveAnalysis = (data: AnalysisSaveData) => {
 export const getUserAnalyses = () => {
   return api.get<SavedAnalysis[]>('/code/analyses');
 };
+
+export const prepareChatSession = (githubUrl: string) => {
+  return api.post<{ chatSessionId: string }>('/code/chat/prepare', { githubUrl });
+};
+
+export const getChatStatus = (sessionId: string) => {
+  return api.get<{ status: 'preparing' | 'ready' | 'error' }>(`/code/chat/status/${sessionId}`);
+};

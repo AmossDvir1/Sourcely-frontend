@@ -28,6 +28,22 @@ const Analyzer: React.FC = () => {
     setStep("MODEL_SELECTION");
   };
 
+const handleChatRequest = async (submittedUrl: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // This will be a new API call we create
+      const response = await analysisService.prepareChatSession(submittedUrl);
+      const { chatSessionId } = response.data;
+      navigate(`/chat/${chatSessionId}`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
+    } catch (err: any) {
+      setError("Could not prepare chat session. The repository might be private or invalid.");
+      setIsLoading(false);
+    }
+  };
+
+
  const handleAnalyze = async (settings: AnalysisSettings) => {
     setIsLoading(true);
     setError(null);
@@ -103,7 +119,7 @@ const Analyzer: React.FC = () => {
             animate={{ opacity: 1 }}
             className="w-full"
           >
-            <Step1_RepoInput onUrlSubmit={handleRepoSubmit} />
+            <Step1_RepoInput onUrlSubmit={handleRepoSubmit} onChatSubmit={handleChatRequest} />
           </motion.div>
         );
       case "MODEL_SELECTION":

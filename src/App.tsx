@@ -11,6 +11,7 @@ import AnalysesSettings from "./pages/settings/AnalysesSettings";
 import ProfileSettings from "./pages/settings/ProfileSettings";
 import AnalysisDisplayTest from "./pages/AnalysisDisplayTest";
 import AnalysisViewerPage from "./pages/analyzer/AnalysisViewerPage";
+import ChatPage from "./pages/ChatPage";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/chat/:sessionId" element={<ChatPage />} />
 
         <Route path="/theme" element={<ThemeTest />} />
         <Route path="/testanalysis" element={<AnalysisDisplayTest />} />

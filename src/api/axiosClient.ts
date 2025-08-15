@@ -2,16 +2,15 @@ import axios from "axios";
 import { storage } from "../utils/localStorage";
 import { AUTH_TOKEN_KEY } from "../constants";
 
-const baseURL = `${import.meta.env.VITE_API_BASE_URL}/api/${
-  import.meta.env.VITE_API_VERSION
-}`;
+const baseURL = import.meta.env.VITE_API_BASE_URL;
+const ApiVersion = import.meta.env.VITE_API_VERSION;
 
 // ====================================================================
 // INSTANCE 1: The main API instance for all standard requests.
 // This instance has the interceptors attached.
 // ====================================================================
 const api = axios.create({
-  baseURL,
+  baseURL: `${baseURL}/api/${ApiVersion}`,
   withCredentials: true, // Crucial for sending cookies with requests
 });
 

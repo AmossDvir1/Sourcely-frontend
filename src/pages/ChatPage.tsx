@@ -6,22 +6,20 @@ import Typography from "../components/atoms/Typography";
 import GlowingSpinner from "../components/atoms/GlowingSpinner";
 import * as analysisService from "../api/analysisService";
 import TextField from "../components/atoms/TextField";
+import { useChatSocket } from "../hooks/useChatSocket";
 
 type IndexingStatus = "preparing" | "ready" | "error";
 
-interface Message {
-  id: number;
-  text: string;
-  sender: "user" | "bot";
-}
-
 const ChatPage = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
-  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [indexingStatus, setIndexingStatus] =
     useState<IndexingStatus>("preparing");
-  const webSocketRef = useRef<WebSocket | null>(null);
+
+  const { messages, isConnected, sendMessage } = useChatSocket({
+    sessionId: sessionId || "",
+    isReady: indexingStatus === "ready",
+  });
 
   const pollingIntervalRef = useRef<number | null>(null);
 
@@ -56,59 +54,9 @@ const ChatPage = () => {
     };
   }, [sessionId]);
 
-  // Effect for establishing WebSocket connection ONCE ready
-  useEffect(() => {
-    if (indexingStatus === "ready" && sessionId && !webSocketRef.current) {
-      const wsUrl = `ws://localhost:3001/api/v1/code/ws/chat/${sessionId}`;
-      const ws = new WebSocket(wsUrl);
-      webSocketRef.current = ws;
-
-      ws.onopen = () => console.log("WebSocket connected");
-      ws.onmessage = (event) => {
-        // Append streaming bot response
-        setMessages((prev) => {
-          const lastMessage = prev[prev.length - 1];
-          if (lastMessage && lastMessage.sender === "bot") {
-            // Append to the last message
-            const updatedMessages = [...prev];
-            updatedMessages[updatedMessages.length - 1] = {
-              ...lastMessage,
-              text: lastMessage.text + event.data,
-            };
-            return updatedMessages;
-          } else {
-            // Create a new bot message
-            return [
-              ...prev,
-              { id: Date.now(), text: event.data, sender: "bot" },
-            ];
-          }
-        });
-      };
-      ws.onclose = () => console.log("WebSocket disconnected");
-      ws.onerror = (error) => console.error("WebSocket error:", error);
-    }
-
-    // Cleanup WebSocket on component unmount
-    return () => {
-      webSocketRef.current?.close();
-    };
-  }, [indexingStatus, sessionId]);
-
   const handleSendMessage = () => {
-    if (
-      inputValue.trim() &&
-      webSocketRef.current?.readyState === WebSocket.OPEN
-    ) {
-      const userMessage: Message = {
-        id: Date.now(),
-        text: inputValue,
-        sender: "user",
-      };
-      setMessages((prev) => [...prev, userMessage]);
-      webSocketRef.current.send(inputValue);
-      setInputValue("");
-    }
+    sendMessage(inputValue);
+    setInputValue("");
   };
 
   const renderStatus = () => {
@@ -175,25 +123,27 @@ const ChatPage = () => {
             ))}
       </Paper>
 
-<div className="p-2 sm:p-4 bg-bg-paper border-t border-border flex items-center gap-2">
-  <TextField
-    className="flex-1"
-    placeholder="Ask a question about the code..."
-    value={inputValue}
-    onChange={(e) => setInputValue(e.target.value)}
-    onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-    disabled={indexingStatus !== "ready"}
-  />
-  <IconButton
-    className="flex-shrink-0"
-    onClick={handleSendMessage}
-    disabled={
-      indexingStatus !== "ready" || inputValue.trim().length === 0
-    }
-  >
-    <SendIcon />
-  </IconButton>
-</div>
+      <div className="p-2 sm:p-4 bg-bg-paper border-t border-border flex items-center gap-2">
+        <TextField
+          className="flex-1"
+          placeholder="Ask a question about the code..."
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+          disabled={indexingStatus !== "ready" || !isConnected}
+        />
+        <IconButton
+          className="flex-shrink-0"
+          onClick={handleSendMessage}
+          disabled={
+            !isConnected ||
+            indexingStatus !== "ready" ||
+            inputValue.trim().length === 0
+          }
+        >
+          <SendIcon />
+        </IconButton>
+      </div>
     </div>
   );
 };

@@ -22,14 +22,8 @@ const ChatPage = () => {
   const [indexingStatus, setIndexingStatus] =
     useState<IndexingStatus>("preparing");
   const webSocketRef = useRef<WebSocket | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null); // Ref for auto-scrolling
 
   const pollingIntervalRef = useRef<number | null>(null);
-
-  // Auto-scroll to the bottom of the messages list when it updates
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -179,40 +173,27 @@ const ChatPage = () => {
                 </Paper>
               </div>
             ))}
-        <div ref={messagesEndRef} />
       </Paper>
 
-      <div className="p-2 sm:p-4 bg-bg-paper border-t border-border flex ">
-        <TextField
-          fullWidth
-          placeholder="Ask a question about the code..."
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-          disabled={indexingStatus !== "ready"}
-          //   InputProps={{
-          //     endAdornment: (
-          //       <IconButton
-          //         onClick={handleSendMessage}
-          //         disabled={indexingStatus !== "ready"}
-          //         edge="end"
-          //       >
-          //         <SendIcon />
-          //       </IconButton>
-          //     ),
-          //   }}
-        />
-        <IconButton
-          disableRipple
-          onClick={handleSendMessage}
-          disabled={
-            indexingStatus !== "ready" || inputValue.trim().length === 0
-          }
-          edge="end"
-        >
-          <SendIcon />
-        </IconButton>
-      </div>
+<div className="p-2 sm:p-4 bg-bg-paper border-t border-border flex items-center gap-2">
+  <TextField
+    className="flex-1"
+    placeholder="Ask a question about the code..."
+    value={inputValue}
+    onChange={(e) => setInputValue(e.target.value)}
+    onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+    disabled={indexingStatus !== "ready"}
+  />
+  <IconButton
+    className="flex-shrink-0"
+    onClick={handleSendMessage}
+    disabled={
+      indexingStatus !== "ready" || inputValue.trim().length === 0
+    }
+  >
+    <SendIcon />
+  </IconButton>
+</div>
     </div>
   );
 };

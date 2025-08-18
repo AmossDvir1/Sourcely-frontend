@@ -26,6 +26,7 @@ type AiSettingsProps = {
   setSelectedModel: (modelId: string) => void;
   selectedModel: string;
   setRepoName: (name: string) => void;
+  onSettingsFetched: (repoName: string, codebase: string) => void; 
 };
 
 const individualContentTypes = [
@@ -42,7 +43,8 @@ export const Step2_AiSettings: React.FC<AiSettingsProps> = ({
   isLoading,
   setSelectedModel,
   selectedModel,
-  setRepoName
+  setRepoName,
+  onSettingsFetched
 }) => {
   // --- STATE MANAGEMENT (No changes needed here) ---
   const [isFetching, setIsFetching] = useState(true);
@@ -59,14 +61,16 @@ export const Step2_AiSettings: React.FC<AiSettingsProps> = ({
     setIsFetching(true);
     setError(null);
     try {
-      const [modelsResponse, extensionsResponse] = await Promise.all([
+      const [modelsResponse, repoDataResponse] = await Promise.all([
         analysisService.getModels(),
-        analysisService.getRepoFileExtensions(repoUrl),
+        analysisService.getRepoData(repoUrl),
       ]);
-      const fetchedExtensions = extensionsResponse.data.extensions;
-      const fetchedRepoName = extensionsResponse.data.repoName;
+      const fetchedExtensions = repoDataResponse.data.extensions;
+      const fetchedRepoName = repoDataResponse.data.repoName;
+      const fetchedRepoCodebase = repoDataResponse.data.codebase;
 
       setModels(modelsResponse.data);
+      onSettingsFetched(fetchedRepoName, fetchedRepoCodebase); 
       setAvailableExtensions(fetchedExtensions);
       setRepoName(fetchedRepoName);
       setIncludedExtensions(["All", ...fetchedExtensions]);
@@ -76,7 +80,7 @@ export const Step2_AiSettings: React.FC<AiSettingsProps> = ({
     } finally {
       setIsFetching(false);
     }
-  }, [repoUrl, setRepoName]);
+  }, [repoUrl, onSettingsFetched, setRepoName]);
 
   useEffect(() => {
     fetchData();

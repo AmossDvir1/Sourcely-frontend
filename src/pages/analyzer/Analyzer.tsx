@@ -17,7 +17,7 @@ const Analyzer: React.FC = () => {
   const [step, setStep] = useState<AnalysisStep>("INPUT");
   const [selectedModel, setSelectedModel] = useState<string>("");
   const [repoName, setRepoName] = useState<string>("");
-
+  const [codebase, setCodebase] = useState<string>(""); 
   const [url, setUrl] = useState("");
 
   const [isLoading, setIsLoading] = useState(false);
@@ -44,6 +44,11 @@ const handleChatRequest = async (submittedUrl: string) => {
   };
 
 
+    const handleSettingsFetched = (repoName: string, fetchedCodebase: string) => {
+    setRepoName(repoName);
+    setCodebase(fetchedCodebase); // <-- Store the fetched codebase
+  };
+
  const handleAnalyze = async (settings: AnalysisSettings) => {
     setIsLoading(true);
     setError(null);
@@ -56,7 +61,8 @@ const handleChatRequest = async (submittedUrl: string) => {
         {
           contentType: settings.contentType,
           includedExtensions: settings.includedExtensions,
-        }
+        },
+        codebase
       )).data;
 
       const tempId = stageResponse.tempId;
@@ -67,7 +73,7 @@ const handleChatRequest = async (submittedUrl: string) => {
       // STEP 3: Navigate to the viewer page.
       // - The 'tempId' goes in the URL.
       // - The full 'analysisData' is passed in the navigation state object.
-      navigate(`/analysis/view/${tempId}`, { state: { analysis: analysisData } });
+      navigate(`/analysis/view/${tempId}`, { state: { analysis: analysisData, codebase: codebase } });
 
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -139,6 +145,7 @@ const handleChatRequest = async (submittedUrl: string) => {
               onAnalyze={handleAnalyze}
               onBack={() => setStep("INPUT")}
               isLoading={isLoading}
+              onSettingsFetched={handleSettingsFetched}
             />
           </motion.div>
         );

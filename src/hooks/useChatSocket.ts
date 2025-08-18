@@ -1,12 +1,11 @@
-
-import { useState, useEffect, useRef } from 'react';
-import io, { Socket } from 'socket.io-client';
+import { useState, useEffect, useRef } from "react";
+import io, { Socket } from "socket.io-client";
 
 // Define the shape of a message for type safety
 export interface Message {
   id: number;
   text: string;
-  sender: 'user' | 'bot';
+  sender: "user" | "bot";
 }
 
 // Define the props our hook will accept
@@ -26,34 +25,34 @@ export const useChatSocket = ({ sessionId, isReady }: UseChatSocketProps) => {
     if (isReady && sessionId && !socketRef.current) {
       // --- DYNAMIC URL LOGIC ---
       // Socket.IO needs a standard HTTP/HTTPS URL for the initial handshake.
- const socket = io(baseURL, {
+      const socket = io(baseURL, {
         path: "/ws/socket.io/", // Standard path for Socket.IO
-        transports: ['websocket'],
-              query: {
-          sessionId: sessionId
-        }
+        transports: ["websocket"],
+        query: {
+          sessionId: sessionId,
+        },
       });
       socketRef.current = socket;
 
-
-      socket.on('connect', () => {
-        console.log('Socket.IO connected successfully');
+      socket.on("connect", () => {
+        console.log("Socket.IO connected successfully");
         setIsConnected(true);
       });
 
-      socket.on('disconnect', () => {
-        console.log('Socket.IO disconnected');
+      socket.on("disconnect", () => {
+        console.log("Socket.IO disconnected");
         setIsConnected(false);
       });
-      
+
       // The event name 'message' is the default for standard WebSockets
-      socket.on('message', (data: string) => {
+      socket.on("message", (data: string) => {
         setMessages((prev) => {
           const lastMessage = prev[prev.length - 1];
           if (lastMessage && lastMessage.sender === "bot") {
             const updatedMessages = [...prev];
             updatedMessages[updatedMessages.length - 1] = {
-              ...lastMessage, text: lastMessage.text + data
+              ...lastMessage,
+              text: lastMessage.text + data,
             };
             return updatedMessages;
           } else {
@@ -73,8 +72,7 @@ export const useChatSocket = ({ sessionId, isReady }: UseChatSocketProps) => {
     if (text.trim() && socketRef.current?.connected) {
       const userMessage: Message = { id: Date.now(), text, sender: "user" };
       setMessages((prev) => [...prev, userMessage]);
-      socketRef.current.emit('message', text);
-
+      socketRef.current.emit("message", text);
     }
   };
 

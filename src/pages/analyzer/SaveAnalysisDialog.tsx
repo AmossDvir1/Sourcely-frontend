@@ -17,9 +17,10 @@ export interface AnalysisSaveData {
   description?: string;
   repository: string;
   analysisDate: string;
-  model: string;
+  modelUsed: string; 
   analysisContent: string;
-  analysisId?: string; 
+  tempId?: string; // Renamed from 'analysisId'
+
 }
 
 type SaveAnalysisDialogProps = {
@@ -27,7 +28,7 @@ type SaveAnalysisDialogProps = {
   onClose: () => void;
   onSave: (data: AnalysisSaveData) => Promise<void>;
   repoName: string;
-  modelUsed: string; // e.g., "GPT-4",
+  modelUsed: string;
   analysisContent: string;
   analysisId?: string; 
 };
@@ -57,9 +58,9 @@ const handleSave = async () => {
       description,
       repository: repoName,
       analysisDate,
-      model: modelUsed,
+      modelUsed: modelUsed,
       analysisContent,
-      analysisId: analysisId, // NEW: Include the ID in the save data
+      tempId: analysisId, // NEW: Include the ID in the save data
     };
 
     try {

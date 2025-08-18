@@ -4,13 +4,14 @@ import { AUTH_TOKEN_KEY } from "../constants";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 const ApiVersion = import.meta.env.VITE_API_VERSION;
-
+const apiBaseUrl = `${baseURL}/api/${ApiVersion}`;
+ 
 // ====================================================================
 // INSTANCE 1: The main API instance for all standard requests.
 // This instance has the interceptors attached.
 // ====================================================================
 const api = axios.create({
-  baseURL: `${baseURL}/api/${ApiVersion}`,
+  baseURL: apiBaseUrl,
   withCredentials: true, // Crucial for sending cookies with requests
 });
 
@@ -20,7 +21,7 @@ const api = axios.create({
 // the infinite recursive loop if the refresh call itself fails.
 // ====================================================================
 const apiRefresh = axios.create({
-  baseURL,
+  baseURL: apiBaseUrl,
   withCredentials: true,
 });
 

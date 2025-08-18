@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import Dialog from '../components/Dialog';
-import { DialogTitle, DialogContent, DialogActions, Typography } from '@mui/material';
+import { DialogTitle, DialogContent, DialogActions } from '@mui/material';
+
 import Button from '../components/atoms/Button';
+import Typography from '../components/atoms/Typography';
 
 interface RegisterToSaveDialogProps {
   open: boolean;

@@ -34,7 +34,7 @@ const Dialog = React.forwardRef<
             // To ensure readability against the new glass backdrop,
             // we will make the dialog panel a solid, opaque card.
             "shadow-none", // Remove MUI's default elevation
-            "bg-bg-paper", // Use our standard solid card background
+            "bg-bg-paper-light/90", // Use our standard solid card background
             // "ring-1 ring-border", // A crisp, standard border
             "rounded-2xl", // Modern rounded corners
             "outline outline-2 outline-primary/50",

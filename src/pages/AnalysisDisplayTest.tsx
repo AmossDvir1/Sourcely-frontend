@@ -62,7 +62,7 @@ export default function AnalysisDisplayTest() {
   const handleSaveAnalysis = async (data: AnalysisSaveData) => {
     const saveData = {
       ...data,
-      sourceCode: "sourceCode",
+      codebase: "sourceCode",
     };
 
     try {
@@ -81,6 +81,7 @@ export default function AnalysisDisplayTest() {
       onSave={handleSaveAnalysis}
       repoName="https://github.com/AmossDvir/OS-ex4"
       repoUrl="https://github.com/AmossDvir/OS-ex4"
+      codebase=""
     ></AnalysisDisplay>
   );
 }

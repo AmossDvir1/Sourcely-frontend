@@ -24,8 +24,18 @@ export interface SavedAnalysis {
   repository: string;
   modelUsed: string;
   analysisContent: string;
-  sourceCode: string;
   analysisDate: string; // ISO string date
+}
+
+// PAYLOAD INTERFACE: Data sent TO the '/analyses' endpoint.
+// This matches the backend's `AnalysisCreate` Pydantic schema.
+export interface AnalysisSavePayload {
+  name: string;
+  description?: string;
+  repository: string;
+  modelUsed: string;
+  analysisContent: string;
+  tempId?: string; // The optional, original tempId from the URL
 }
 
 /**
@@ -38,10 +48,16 @@ export const getAnalysisById = (analysisId: string) => {
 /**
  * Fetches the list of file extensions from a repository for masking.
  */
-export const getRepoFileExtensions = (githubUrl: string) => {
-  return api.post<{ extensions: string[]; repoName: string }>("/code/prepare-analysis", { githubUrl });
+export const getRepoData = (githubUrl: string) => {
+  return api.post<{ extensions: string[]; repoName: string; codebase: string }>("/code/prepare-analysis", { githubUrl });
 };
 
+/**
+ * Deletes a saved analysis by its ID for the authenticated user.
+ */
+export const deleteAnalysis = (analysisId: string) => {
+  return api.delete(`/code/analyses/${analysisId}`);
+};
 
 /**
  * Fetches the list of available AI models from the backend.
@@ -56,13 +72,15 @@ export const getModels = () => {
 export const analyzeRepo = (
   githubUrl: string, 
   modelId: string, 
-  settings: { contentType: string[]; includedExtensions: string[] | null }
+  settings: { contentType: string[]; includedExtensions: string[] | null },
+  codebase: string 
 ) => {
   return api.post<StagedAnalysisResponse>("/code/analyze", { 
     githubUrl, 
     modelId, 
-    includedExtensions: settings.includedExtensions ,
+    includedExtensions: settings.includedExtensions,
     contentTypes: settings.contentType,
+    codebase: codebase 
   });
 };
 /**
@@ -73,10 +91,9 @@ export const saveAnalysis = (data: AnalysisSaveData) => {
         name: data.name,
         description: data.description,
         repository: data.repository,
-        modelUsed: data.model,
+        modelUsed: data.modelUsed,
         analysisContent: data.analysisContent,
-        sourceCode: "placeholder", // This still needs to be handled
-        tempId: data.analysisId // Pass the ID to claim the analysis
+        tempId: data.tempId // Pass the ID to claim the analysis
     };
   return api.post<SavedAnalysis>('/code/analyses', payload);
 };

@@ -9,7 +9,6 @@ import ThemeTest from "./pages/ThemeTest";
 import SettingsPage from "./pages/settings/SettingsPage";
 import AnalysesSettings from "./pages/settings/AnalysesSettings";
 import ProfileSettings from "./pages/settings/ProfileSettings";
-import AnalysisDisplayTest from "./pages/AnalysisDisplayTest";
 import AnalysisViewerPage from "./pages/analyzer/AnalysisViewerPage";
 import ChatPage from "./pages/ChatPage";
 

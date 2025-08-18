@@ -22,7 +22,6 @@ function App() {
         <Route path="/chat/:sessionId" element={<ChatPage />} />
 
         <Route path="/theme" element={<ThemeTest />} />
-        <Route path="/testanalysis" element={<AnalysisDisplayTest />} />
         <Route
           path="/analysis/view/:analysisId"
           element={<AnalysisViewerPage />}

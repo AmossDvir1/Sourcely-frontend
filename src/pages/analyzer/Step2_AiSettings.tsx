@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { Alert } from "@mui/material";
 import Typography from "../../components/atoms/Typography";
 import Button from "../../components/atoms/Button";
@@ -56,35 +56,64 @@ export const Step2_AiSettings: React.FC<AiSettingsProps> = ({
     "All",
   ]);
 
-  // --- DATA FETCHING & EVENT HANDLERS (No changes needed here) ---
-  const fetchData = useCallback(async () => {
-    setIsFetching(true);
-    setError(null);
-    try {
-      const [modelsResponse, repoDataResponse] = await Promise.all([
-        analysisService.getModels(),
-        analysisService.getRepoData(repoUrl),
-      ]);
-      const fetchedExtensions = repoDataResponse.data.extensions;
-      const fetchedRepoName = repoDataResponse.data.repoName;
-      const fetchedRepoCodebase = repoDataResponse.data.codebase;
+useEffect(() => {
+    let isCancelled = false; // Flag to check if the component has unmounted
 
-      setModels(modelsResponse.data);
-      onSettingsFetched(fetchedRepoName, fetchedRepoCodebase); 
-      setAvailableExtensions(fetchedExtensions);
-      setRepoName(fetchedRepoName);
-      setIncludedExtensions(["All", ...fetchedExtensions]);
-    } catch (err) {
-      console.error("Failed to fetch settings data:", err);
-      setError("Could not load repository data or AI models. Please try again.");
-    } finally {
-      setIsFetching(false);
-    }
+    const fetchData = async () => {
+      setIsFetching(true);
+      setError(null);
+      try {
+        const [modelsResponse, repoDataResponse] = await Promise.all([
+          analysisService.getModels(),
+          analysisService.getRepoData(repoUrl),
+        ]);
+
+        // IMPORTANT: Check if the effect has been cancelled before updating state
+        if (!isCancelled) {
+          const fetchedExtensions = repoDataResponse.data.extensions;
+          const fetchedRepoName = repoDataResponse.data.repoName;
+          const fetchedRepoCodebase = repoDataResponse.data.codebase;
+
+          setModels(modelsResponse.data);
+          onSettingsFetched(fetchedRepoName, fetchedRepoCodebase);
+          setAvailableExtensions(fetchedExtensions);
+          setRepoName(fetchedRepoName);
+          setIncludedExtensions(["All", ...fetchedExtensions]);
+        }
+      } catch (err) {
+        if (!isCancelled) {
+          console.error("Failed to fetch settings data:", err);
+          setError("Could not load repository data or AI models. Please try again.");
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsFetching(false);
+        }
+      }
+    };
+
+    fetchData();
+
+    // The cleanup function: This runs when the component unmounts.
+    // It sets the flag, preventing the pending async operations from updating state.
+    return () => {
+      isCancelled = true;
+    };
+    // The dependencies for this effect are the props that, when changed, should trigger a re-fetch.
   }, [repoUrl, onSettingsFetched, setRepoName]);
 
+  // This second useEffect for setting the default model is fine and can remain.
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (models?.length === 0) {
+      setSelectedModel("");
+    } else {
+      setSelectedModel(
+        models?.find((model) => model.id === DEFAULT_MODEL_ID)?.id ||
+          models[0]?.id ||
+          ""
+      );
+    }
+  }, [models, setSelectedModel]);
 
   useEffect(() => {
     if (models?.length === 0) {

@@ -110,7 +110,7 @@ html {
   --color-bg-paper: #ffffff; /* Card/modal background */
   --color-bg-paper-light: #f4f8fb;
   --color-bg-hover: #f1f5f9; /* Subtle hover for list items */
-
+--color-puller-bg: #cad5e3;
   /* Text */
   --color-text-primary: #020617; /* Strongest text color (dark navy/slate) */
   --color-text-secondary: #475569; /* Subtitles, secondary info */
@@ -169,7 +169,7 @@ html {
   --color-bg-paper: #0f172a; /* Cards and surfaces (one step lighter) */
   --color-bg-paper-light: #171e2e; /* Cards and surfaces (one step lighter) */
   --color-bg-hover: #1e293b; /* Hover for list items */
-
+ --color-puller-bg: #475569; 
   /* Text */
   --color-text-primary: #f8fafc; /* Main text (a soft, not-quite-white) */
   --color-text-secondary: #94a3b8; /* Subtitles and placeholder text */

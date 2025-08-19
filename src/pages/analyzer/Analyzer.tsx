@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Alert } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -44,10 +44,10 @@ const handleChatRequest = async (submittedUrl: string) => {
   };
 
 
-    const handleSettingsFetched = (repoName: string, fetchedCodebase: string) => {
+  const handleSettingsFetched = useCallback((repoName: string, fetchedCodebase: string) => {
     setRepoName(repoName);
-    setCodebase(fetchedCodebase); // <-- Store the fetched codebase
-  };
+    setCodebase(fetchedCodebase);
+  }, []);
 
  const handleAnalyze = async (settings: AnalysisSettings) => {
     setIsLoading(true);

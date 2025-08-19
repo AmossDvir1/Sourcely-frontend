@@ -110,5 +110,6 @@ export const prepareChatSession = (githubUrl: string) => {
 };
 
 export const getChatStatus = (sessionId: string) => {
-  return api.get<{ status: 'preparing' | 'ready' | 'error' }>(`/code/chat/status/${sessionId}`);
+  // Update the return type to include the optional `suggestions` array
+  return api.get<{ status: 'preparing' | 'ready' | 'error'; suggestions?: string[] }>(`/code/chat/status/${sessionId}`);
 };

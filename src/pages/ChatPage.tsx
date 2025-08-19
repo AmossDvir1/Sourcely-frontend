@@ -1,14 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Paper, IconButton, Alert, Dialog, Chip, Box } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
+import { Paper, IconButton, Alert, Dialog } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Typography from "../components/atoms/Typography";
 import GlowingSpinner from "../components/atoms/GlowingSpinner";
 import * as analysisService from "../api/analysisService";
-import TextField from "../components/atoms/TextField";
 import { useChatSocket } from "../hooks/useChatSocket";
 import { useResponsive } from "../hooks/useResponsive";
+import ChatTextField from "../components/atoms/ChatTextField";
 
 type IndexingStatus = "preparing" | "ready" | "error";
 
@@ -39,10 +38,7 @@ const ChatPage = () => {
         const response = await analysisService.getChatStatus(sessionId);
         const status = response.data.status;
 
-        if (
-          status === "ready" ||
-          status === "error"
-        ) {
+        if (status === "ready" || status === "error") {
           setIndexingStatus(status);
           if (status === "ready") {
             // Use suggestions from API, fallback to empty array if none are provided
@@ -116,58 +112,6 @@ const ChatPage = () => {
     }
   };
 
-  const ChatInput = () => (
-    <div className="flex-shrink-0 p-2 sm:p-4 bg-bg-paper border-t border-border flex flex-col gap-2">
-      {/* Conditionally render the suggestion chips */}
-      {showSuggestions && indexingStatus === "ready" && (
-        <Box className="flex flex-wrap items-center gap-2 px-1 animate-fade-in">
-          {suggestions.map((text) => (
-            <Chip
-              key={text}
-              label={text}
-              size="small"
-              variant="outlined"
-              onClick={() => handleSuggestionClick(text)}
-              sx={{
-                cursor: "pointer",
-                color: "var(--color-text-secondary)",
-                borderColor: "var(--color-border-light)",
-                "&:hover": {
-                  backgroundColor: "var(--color-bg-hover)",
-                  color: "var(--color-primary)",
-                  borderColor: "var(--color-primary)",
-                },
-              }}
-            />
-          ))}
-        </Box>
-      )}
-
-      {/* The actual text field and send button */}
-      <div className="flex items-center gap-2">
-        <TextField
-          className="flex-1"
-          placeholder="Ask a question about the code..."
-          value={inputValue}
-          onChange={handleInputChange} // Use the new handler
-          onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-          disabled={indexingStatus !== "ready" || !isConnected}
-        />
-        <IconButton
-          className="flex-shrink-0"
-          onClick={handleSendMessage}
-          disabled={
-            !isConnected ||
-            indexingStatus !== "ready" ||
-            inputValue.trim().length === 0
-          }
-        >
-          <SendIcon />
-        </IconButton>
-      </div>
-    </div>
-  );
-
   const messageList = (
     // This JSX for the list of messages is identical for both layouts
     <>
@@ -222,28 +166,16 @@ const ChatPage = () => {
           <div className="flex-grow p-2 overflow-y-auto space-y-2">
             {indexingStatus !== "ready" ? renderStatus() : messageList}
           </div>
-
-          {/* <div className="flex-shrink-0 p-2 bg-bg-paper border-t border-border flex items-center gap-2">
-            <TextField
-              className="flex-1"
-              placeholder="Ask a question..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-              disabled={indexingStatus !== "ready" || !isConnected}
-            />
-            <IconButton
-              onClick={handleSendMessage}
-              disabled={
-                !isConnected ||
-                indexingStatus !== "ready" ||
-                inputValue.trim().length === 0
-              }
-            >
-              <SendIcon />
-            </IconButton>
-          </div> */}
-          <ChatInput />
+          <ChatTextField
+            showSuggestions={showSuggestions}
+            indexingStatus={indexingStatus}
+            suggestions={suggestions}
+            inputValue={inputValue}
+            isConnected={isConnected}
+            onInputChange={handleInputChange}
+            onSuggestionClick={handleSuggestionClick}
+            onSendMessage={handleSendMessage}
+          />
         </div>
       </Dialog>
     );
@@ -264,29 +196,16 @@ const ChatPage = () => {
       <Paper className="flex-grow p-2 sm:p-4 overflow-y-auto bg-bg-paper-light space-y-2 sm:space-y-4">
         {indexingStatus !== "ready" ? renderStatus() : messageList}
       </Paper>
-
-      {/* <div className="p-2 sm:p-4 bg-bg-paper border-t border-border flex items-center gap-2">
-        <TextField
-          className="flex-1"
-          placeholder="Ask a question about the code..."
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-          disabled={indexingStatus !== "ready" || !isConnected}
-        />
-        <IconButton
-          className="flex-shrink-0"
-          onClick={handleSendMessage}
-          disabled={
-            !isConnected ||
-            indexingStatus !== "ready" ||
-            inputValue.trim().length === 0
-          }
-        >
-          <SendIcon />
-        </IconButton>
-      </div> */}
-      <ChatInput />
+      <ChatTextField
+        showSuggestions={showSuggestions}
+        indexingStatus={indexingStatus}
+        suggestions={suggestions}
+        inputValue={inputValue}
+        isConnected={isConnected}
+        onInputChange={handleInputChange}
+        onSuggestionClick={handleSuggestionClick}
+        onSendMessage={handleSendMessage}
+      />
     </div>
   );
 };

@@ -76,9 +76,11 @@ html {
   background-color: var(--color-secondary);
 }
 :root {
-
-    --color-primary-rgb: 209, 71, 149; /* This is the RGB for #d14795 */
+  --color-primary-rgb: 209, 71, 149; /* This is the RGB for #d14795 */
   --color-secondary-rgb: 8, 145, 178; /* This is the RGB for #0891b2 */
+  /* --color-warning-rgba: 245, 158, 11; */
+
+  /* --color-warning-rgb: rgb(250, 204, 21); */
 }
 @theme {
   --font-code: "Code", system-ui, sans-serif;
@@ -106,6 +108,7 @@ html {
   /* Semantic Colors */
   --color-success: #16a34a;
   --color-warning: #f59e0b;
+  --color-warning-rgb: 245, 158, 11;
   --color-error: #dc2626;
   --color-on-error: #ffffff;
 
@@ -114,7 +117,7 @@ html {
   --color-bg-paper: #ffffff; /* Card/modal background */
   --color-bg-paper-light: #f4f8fb;
   --color-bg-hover: #f1f5f9; /* Subtle hover for list items */
---color-puller-bg: #cad5e3;
+  --color-puller-bg: #cad5e3;
   /* Text */
   --color-text-primary: #020617; /* Strongest text color (dark navy/slate) */
   --color-text-secondary: #475569; /* Subtitles, secondary info */
@@ -165,6 +168,7 @@ html {
   /* Semantic Colors (Brighter for better visibility) */
   --color-success: #4ade80;
   --color-warning: #facc15;
+  --color-warning-rgb: 250, 204, 21;
   --color-error: #f87171;
   --color-on-error: #1f2937;
 
@@ -173,7 +177,7 @@ html {
   --color-bg-paper: #0f172a; /* Cards and surfaces (one step lighter) */
   --color-bg-paper-light: #171e2e; /* Cards and surfaces (one step lighter) */
   --color-bg-hover: #1e293b; /* Hover for list items */
- --color-puller-bg: #475569; 
+  --color-puller-bg: #475569;
   /* Text */
   --color-text-primary: #f8fafc; /* Main text (a soft, not-quite-white) */
   --color-text-secondary: #94a3b8; /* Subtitles and placeholder text */

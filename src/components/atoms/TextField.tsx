@@ -60,7 +60,7 @@ const TextField = React.forwardRef<HTMLDivElement, TextFieldProps>(
               : "var(--color-text-disabled)",
           },
         }}
-        {...rest} 
+        {...rest}
       />
     );
   }

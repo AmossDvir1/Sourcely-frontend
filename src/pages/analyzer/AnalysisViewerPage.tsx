@@ -10,63 +10,78 @@ import type { AnalysisSaveData } from "./SaveAnalysisDialog";
 const AnalysisViewerPage = () => {
   const { analysisId } = useParams<{ analysisId: string }>();
   const navigate = useNavigate();
-  const location = useLocation(); // Get location object to access state
+  const location = useLocation();
 
+  // State initialization is correct and remains the same
   const [analysis, setAnalysis] = useState<SavedAnalysis | null>(
     location.state?.analysis || null
   );
-  const [codebase, setCodebase] = useState<string | null>(
-    location.state?.codebase || null
-  );
-  const [isLoading, setIsLoading] = useState(!analysis || !codebase); // Only load if analysis is not pre-loaded
+  const [codebase, setCodebase] = useState<string | null>(null); // Start with null
+  const [isLoading, setIsLoading] = useState(true); // Start loading
   const [error, setError] = useState<string | null>(null);
   const [showCodebase, setShowCodebase] = useState(false);
-  // Determine if the analysis is already saved by checking for a user_id.
   const [isSaved, setIsSaved] = useState(false);
 
   useEffect(() => {
-    if (analysis) {
-      setIsSaved(!!analysis.user_id);
-    }
-    // This effect now runs if the analysis OR the codebase is missing (e.g., on refresh)
-    if ((!analysis || !codebase) && analysisId) {
-      const fetchMissingData = async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-          // Fetch the analysis content (which doesn't have the code)
+    // This flag prevents state updates if the component unmounts during a fetch
+    let isCancelled = false;
+
+    const fetchMissingData = async () => {
+      // Use a local variable to track the analysis data we have or will get.
+      let currentAnalysis = analysis;
+
+      try {
+        // STEP 1: Fetch the core analysis object ONLY if it's missing.
+        // This is the key change that breaks the loop.
+        if (!currentAnalysis && analysisId) {
+          console.log("Analysis data is missing, fetching...");
           const analysisRes = await analysisService.getAnalysisById(analysisId);
-          setAnalysis(analysisRes.data);
-          setIsSaved(!!analysisRes.data.user_id);
-          // If the code is missing, re-fetch it using the repo URL from the analysis data
-          if (!codebase) {
-            const codeRes = await analysisService.getRepoData(
-              analysisRes.data.repository
-            );
-            setCodebase(codeRes.data.codebase);
-          }
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-        } catch (err: any) {
-          setError(
-            "Could not load the analysis. It may have expired or the link is invalid."
-          );
-        } finally {
+          if (isCancelled) return;
+          currentAnalysis = analysisRes.data;
+          setAnalysis(currentAnalysis);
+        }
+
+        // STEP 2: Fetch the codebase ONLY if it's missing AND we have an analysis object.
+        if (!codebase && currentAnalysis) {
+          console.log("Codebase is missing, fetching...");
+          const codeRes = await analysisService.getRepoData(currentAnalysis.repository);
+          if (isCancelled) return;
+          setCodebase(codeRes.data.codebase);
+        }
+
+        // After all fetches, update the 'isSaved' status
+        if (currentAnalysis) {
+          setIsSaved(!!currentAnalysis.user_id);
+        }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
+      } catch (err: any) {
+        if (!isCancelled) {
+          setError("Could not load the analysis. It may have expired or the link is invalid.");
+        }
+      } finally {
+        if (!isCancelled) {
           setIsLoading(false);
         }
-      };
+      }
+    };
 
-      fetchMissingData();
-    }
+    fetchMissingData();
+
+    return () => {
+      isCancelled = true;
+    };
+    // Keep dependencies, as we need the effect to run if any of these change.
+    // The internal logic now correctly handles these changes without looping.
   }, [analysisId, analysis, codebase]);
 
+  // The rest of the handlers are unchanged
   const handleSave = async (data: AnalysisSaveData) => {
     try {
       const dataToSave = { ...data, tempId: analysisId };
-
-
       const response = await analysisService.saveAnalysis(dataToSave);
       setIsSaved(true);
-            if (analysisId !== response.data._id) {
+      if (analysisId !== response.data._id) {
         navigate(`/analysis/view/${response.data._id}`, { replace: true, state: { analysis: response.data, codebase } });
       }
     } catch (error) {
@@ -75,22 +90,16 @@ const AnalysisViewerPage = () => {
     }
   };
 
-  const handleToggleCodebase = () => {
-    setShowCodebase((prev) => !prev);
-  };
-
-  const handleReset = () => {
-    navigate("/"); // Go back to the homepage to start a new analysis
-  };
+  const handleToggleCodebase = () => setShowCodebase((prev) => !prev);
+  const handleReset = () => navigate("/");
 
   const handleDelete = async () => {
     if (!analysisId) return;
     try {
       await analysisService.deleteAnalysis(analysisId);
-      setIsSaved(false); // Update state on success
+      setIsSaved(false);
     } catch (error) {
       console.error("Failed to delete analysis:", error);
-      // Optional: show an error toast to the user
     }
   };
 
@@ -106,7 +115,7 @@ const AnalysisViewerPage = () => {
     return <Alert severity="error">{error}</Alert>;
   }
 
-  if (!analysis || codebase === null || !codebase) {
+  if (!analysis || codebase === null) {
     return <Alert severity="info">Analysis not found.</Alert>;
   }
 

@@ -75,7 +75,11 @@ html {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: var(--color-secondary);
 }
+:root {
 
+    --color-primary-rgb: 209, 71, 149; /* This is the RGB for #d14795 */
+  --color-secondary-rgb: 8, 145, 178; /* This is the RGB for #0891b2 */
+}
 @theme {
   --font-code: "Code", system-ui, sans-serif;
   --font-sans: "WorkSans", system-ui, sans-serif;

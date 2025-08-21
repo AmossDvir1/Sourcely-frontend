@@ -28,12 +28,12 @@ const Analyzer: React.FC = () => {
     setStep("MODEL_SELECTION");
   };
 
-const handleChatRequest = async (submittedUrl: string) => {
+const handleChatRequest = async (submittedUrl: string, agentMode: 'smart' | 'fast') => {
     setIsLoading(true);
     setError(null);
     try {
       // This will be a new API call we create
-      const response = await analysisService.prepareChatSession(submittedUrl);
+      const response = await analysisService.prepareChatSession(submittedUrl, agentMode);
       const { chatSessionId } = response.data;
       navigate(`/chat/${chatSessionId}`);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars

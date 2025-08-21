@@ -1,8 +1,5 @@
 import Typography from "../components/atoms/Typography";
-import Button from "../components/atoms/Button";
-import { useAuth } from "../hooks/useAuth";
 import Analyzer from "./analyzer/Analyzer";
-import { useNavigate } from "react-router-dom";
 import AnimatedTypography from "../components/atoms/AnimatedTypography";
 import { useResponsive } from "../hooks/useResponsive";
 import { motion } from "framer-motion";
@@ -14,8 +11,6 @@ const FADE_IN_VARIANTS = {
 };
 
 const HomePage: React.FC = () => {
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const { isMobile } = useResponsive(); // Step 2: Use the hook
 
   // --- Step 3: Define text sequences based on screen size ---
@@ -53,8 +48,7 @@ const HomePage: React.FC = () => {
 
   return (
     // The main container now has responsive vertical padding
-        <div className="min-h-full flex flex-col items-center justify-center px-2 sm:px-6 py-4 md:py-6">
-
+    <div className="min-h-full flex flex-col items-center justify-center px-2 sm:px-6 py-0 md:py-4">
       {/* 1. HEADLINE: Now with a vibrant theme gradient and animation */}
       <motion.div
         variants={FADE_IN_VARIANTS}
@@ -82,7 +76,7 @@ const HomePage: React.FC = () => {
         <AnimatedTypography
           textSequence={animatedTextSequence}
           code
-          className="text-sm md:text-lg text-text-secondary text-center min-h-[50px] sm:min-h-[120px] mt-4 whitespace-pre-wrap"
+          className="text-sm md:text-lg text-text-secondary text-center min-h-[50px] sm:min-h-[95px] mt-2 md:mt-4 whitespace-pre-wrap"
           repeat={isMobile ? Infinity : 0}
         />
       </motion.div>
@@ -96,24 +90,6 @@ const HomePage: React.FC = () => {
         transition={{ duration: 0.5, delay: 0.4 }}
       >
         <Analyzer />
-      </motion.div>
-
-      {/* 4. AUTHENTICATED ACTIONS: Now with animation */}
-      <motion.div
-        className="mt-0 md:mt-6"
-        variants={FADE_IN_VARIANTS}
-        initial="hidden"
-        animate="visible"
-        transition={{ duration: 0.5, delay: 0.6 }}
-      >
-        {isAuthenticated && (
-          <div className="flex flex-col">
-            <Button onClick={() => navigate("/settings/repositories")}>
-              View My Analyses
-            </Button>
-            
-          </div>
-        )}
       </motion.div>
     </div>
   );

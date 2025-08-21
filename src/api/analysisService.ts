@@ -105,8 +105,8 @@ export const getUserAnalyses = () => {
   return api.get<SavedAnalysis[]>('/code/analyses');
 };
 
-export const prepareChatSession = (githubUrl: string) => {
-  return api.post<{ chatSessionId: string }>('/code/chat/prepare', { githubUrl });
+export const prepareChatSession = (githubUrl: string, agentMode: 'smart' | 'fast') => {
+  return api.post<{ chatSessionId: string }>('/code/chat/prepare', { githubUrl, agentMode });
 };
 
 export const getChatStatus = (sessionId: string) => {

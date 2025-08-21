@@ -37,7 +37,7 @@ const AnalysesSettings = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-48">
-        <CircularProgress />
+        <CircularProgress className='text-primary' />
       </div>
     );
   }
@@ -68,10 +68,11 @@ const AnalysesSettings = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="space-y-6"
+      className="space-y-6 md:space-y-8"
+      transition={{ duration: 0.2 }} 
     >
         <div>
-            <Typography variant="h5" className="font-semibold mb-1">My Analyses</Typography>
+            <Typography variant="h6" className="font-semibold mb-1">My Analyses</Typography>
             <Typography variant="body2" className="text-gray-500">
               Here are all the analyses you've saved.
             </Typography>

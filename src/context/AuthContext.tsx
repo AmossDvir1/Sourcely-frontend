@@ -64,13 +64,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setAuthState("checking");
 
       try {
-        const apiCall = api.get<{ user: User }>("/auth/verify");
+        const apiCall = api.get<User>("/auth/verify");
 
         const [response] = await Promise.all([apiCall, minDelay]);
 
         // Happy path: token is valid.
         if (!isCancelled) {
-          setUser(response.data.user);
+          setUser(response.data);
           setAuthState("authenticated");
         }
       } catch (error) {
@@ -105,11 +105,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setAuthState("authenticated");
   };
 
+  const updateUser = (updatedUserData: User) => {
+    setUser(updatedUserData);
+  };
+
   const value: AuthContextType = {
     isAuthenticated: authState === "authenticated",
     user,
     login,
     logout,
+    updateUser,
   };
 
   return (

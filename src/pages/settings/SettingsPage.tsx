@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Typography from '../../components/atoms/Typography';
 
 const tabs = [
@@ -8,10 +8,10 @@ const tabs = [
 ];
 
 export default function SettingsPage() {
-  // Style for the active tab
   const activeLinkStyle = {
-    color: 'var(--color-primary)', // Using a CSS variable for your theme's primary color
+    color: 'var(--color-primary)',
     borderColor: 'var(--color-primary)',
+    backgroundColor: 'var(--color-bg-hover)',
   };
 
   return (
@@ -21,24 +21,29 @@ export default function SettingsPage() {
       transition={{ duration: 0.5 }}
       className="w-full"
     >
-      <Typography variant="h3" className="mb-2 font-bold">Settings</Typography>
-      <Typography variant="body1" className="text-gray-500 dark:text-gray-400 mb-8">
-        Manage your account settings, profile, and repository analyses.
-      </Typography>
+      <div className="px-4 sm:px-0">
+        <Typography variant="h3" className="mb-2 !text-2xl sm:!text-4xl font-bold">Settings</Typography>
+        <Typography variant="body1" className="text-gray-500 dark:text-gray-400 mb-6 sm:mb-8">
+          Manage your account settings, profile, and repository analyses.
+        </Typography>
+      </div>
 
-      {/* Tab Navigation */}
-      <div className="border-b border-gray-200 dark:border-gray-700 mb-8">
-        <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+      <div className="mb-6 sm:mb-8">
+        <nav className="flex flex-col sm:flex-row sm:space-x-6 sm:border-b sm:border-gray-200 sm:dark:border-gray-700" aria-label="Tabs">
           {tabs.map((tab) => (
             <NavLink
               key={tab.name}
               to={tab.path}
               className={({ isActive }) => `
-                whitespace-nowrap py-4 px-1 border-b-2 font-medium text-md
-                transition-colors duration-200
-                ${!isActive ? 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200' : ''}
+                whitespace-nowrap py-3 px-4 font-medium text-md text-center
+                border-b-2 sm:border-b-2
+                transition-colors duration-200 rounded-t-lg
+                ${!isActive
+                  ? 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                  : ''
+                }
               `}
-              style={({ isActive }) => isActive ? activeLinkStyle : undefined}
+              style={({ isActive }) => (isActive ? activeLinkStyle : undefined)}
             >
               {tab.name}
             </NavLink>
@@ -46,8 +51,16 @@ export default function SettingsPage() {
         </nav>
       </div>
 
-      {/* Nested Route Content Renders Here */}
-      <Outlet />
+      <div className="px-4 sm:px-0 min-h-[25rem]">
+        <AnimatePresence mode="wait">
+          {/* 
+            The Outlet itself is the dynamic part. AnimatePresence will now
+            detect when ProfileSettings is swapped for AnalysesSettings and
+            animate them correctly based on their *own* animation props.
+          */}
+          <Outlet />
+        </AnimatePresence>
+      </div>
     </motion.div>
   );
 }

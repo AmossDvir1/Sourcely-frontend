@@ -3,8 +3,9 @@ import { createContext, useContext } from 'react';
 export interface User {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  // Make these fields optional or allow null
+  firstName: string | null;
+  lastName: string | null;
 }
 
 export interface AuthContextType {
@@ -13,6 +14,7 @@ export interface AuthContextType {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   login: (credentials: any) => Promise<void>;
   logout: () => void;
+  updateUser: (user: User) => void; 
 }
 
 // Create the context with a default value
